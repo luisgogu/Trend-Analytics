@@ -3,7 +3,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const cheerio = require('cheerio');
-const MAX_ITEMS = 50
+const MAX_ITEMS = 20
 const URL = 'https://www.pinterest.es/search/pins/?q=chaise%20longue'
 
 
@@ -19,7 +19,7 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
 
         //Scroll to get MAX_ITEMS pins
         while (items.length <= itemCount) {
-
+            console.log(items.length);
             $('[data-test-id="pin"]').each((idx, e) => {
                 if(items.length > itemCount) {return false;}
                 const element = $(e);
@@ -45,13 +45,24 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
 
             const $ = cheerio.load(bodyHTML2);
 
-            $('[data-test-id="CloseupMainPin"]').each((idx, e) => {
-
+            // $('[data-test-id="CloseupMainPin"]').each((idx, e) => {
+            //
+            //     const element = $(e);
+            //     const image = element.find('img');
+            //     items[i].push(image.attr('alt')); //Mas informacion (opcional) + pins asociats
+            //
+            // });
+            let tags = []
+            $('[data-test-id="vase-tag"] > span').each((idx, e) =>{
                 const element = $(e);
-                const image = element.find('img');
-                items[i].push(image.attr('alt')); //Mas informacion (opcional) + pins asociats
-
+                tags.push(element.text());
             });
+            items[i].push(tags); //tags associats
+
+            //items[i].push(parseInt($('[data-test-id="CloseupUserRep"] [role="button"]:nth-child(3) > div').text()));
+            items[i].push($('[data-test-id="CloseupDescriptionContainer"]').text()); //description
+            items[i].push(parseInt($('[data-test-id="official-user-attribution"] > div:nth-child(2) :nth-child(2)').text())); //seguidors
+            items[i].push($('meta[property="og:updated_time"]').attr('content')); //data
         }
         return items;
     } catch(e) { }
