@@ -22,6 +22,9 @@ def name(first_name, last_name):
 @app.route("/todo", methods=['GET'])
 def todo():
     todo_form = Todo()
+    if todo_form.validate_on_submit():
+        print(todo_form.content.data)
+        return redirect('/')
     return render_template('todo.html', form=todo_form)
     
 
