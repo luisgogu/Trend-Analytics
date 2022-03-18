@@ -3,8 +3,8 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const cheerio = require('cheerio');
-const MAX_ITEMS = 5
-const URL = 'https://www.pinterest.es/search/pins/?q=chaise%20longue'
+const MAX_ITEMS = 5;
+const PATH = 'https://www.pinterest.es/search/pins/?q=';
 
 
 async function scrapeItems(page, itemCount, scrollDelay = 800) {
@@ -21,106 +21,130 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
         while (items.length <= itemCount) {
             console.log(items.length);
             $('[data-test-id="pin"]').each((idx, e) => {
+                let obj = new Object();
                 if(items.length > itemCount) {return false;}
                 const element = $(e);
                 const link = element.find('a[href*="/pin"]');
                 const title = element.find('h3');
                 const image = element.find('img');
 
-                items.push(["https://www.pinterest.es"+link.attr('href'), image.attr('src'), title.text()]);
+                obj.link = "https://www.pinterest.es"+link.attr('href');
+                obj.image = image.attr('src');
+                obj.title = title.text();
+                items.push(obj);
             });
 
             previousHeight = await page.evaluate('document.body.scrollHeight');
             await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
             await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
             await page.waitForTimeout(scrollDelay);
+            console.log(items.length);
         }
 
         //Enter in every pin to get more info
         for (let i = 0; i < items.length; i++) {
-            const url = items[i][0];
+            const url = items[i]['link'];
             await page.goto(url);
 
             let bodyHTML2 = await page.evaluate(() => document.documentElement.outerHTML);
 
             const $ = cheerio.load(bodyHTML2);
 
-            // $('[data-test-id="CloseupMainPin"]').each((idx, e) => {
-            //
-            //     const element = $(e);
-            //     const image = element.find('img');
-            //     items[i].push(image.attr('alt')); //Mas informacion (opcional) + pins asociats
-            //
-            // });
+            //tags associats
             let tags = []
             $('[data-test-id="vase-tag"] > span').each((idx, e) =>{
                 const element = $(e);
                 tags.push(element.text());
             });
-            items[i].push(JSON.stringify(tags)); //tags associats
+            items[i].tags = tags;
 
-            //items[i].push(parseInt($('[data-test-id="CloseupUserRep"] [role="button"]:nth-child(3) > div').text()));
-
-            //descripcio closeup
-            let description = $('[data-test-id="CloseupDescriptionContainer"]').text();
-            if (description == null || description == ''){
-                items[i].push('None');
-            } else{
-                items[i].push(description);
-            }
+            // descripcio closeup
+            // const pws = JSON.parse($("#__PWS_DATA__").text());
+            // const resource = pws.props?.initialReduxState?.resources?.PinResource;
+            // if (resource != null) {
+            //     description = resource[Object.keys(resource)[0]].data.description;
+            //
+            //     if (description == null || description == ''){
+            //         items[i].description = 'None';
+            //     } else{
+            //         items[i].description = description;
+            //     }
+            // }
 
             //descripcio oculta
             let description2 = $('meta[property="description"]').attr('content');
             if (description2 == null || description2 == ''){
-                items[i].push('None');
+                items[i].description2 = 'None';
             } else{
-                items[i].push(description2);
+                items[i].description2 = description2;
             }
 
             //seguidors
             let followers = $('[data-test-id="official-user-attribution"] > div:nth-child(2) :nth-child(2)').text();
             if (followers == null || followers == ''){
-                items[i].push('None');
+                items[i].followers = 'None';
             } else{
-                items[i].push(followers);
+                items[i].followers = followers;
             }
 
             //data
             let date = $('meta[property="og:updated_time"]').attr('content');
             if (date == null || date == ''){
-                items[i].push('None')
+                items[i].date = 'None';
             } else{
-                items[i].push(date);
+                items[i].date = date;
             }
+
+            const ldJSONs = [];
+            $('script[type="application/ld+json"]').each((idx, e) => {
+                console.log($(e).html());
+                ldJSONs.push(JSON.parse($(e).html())[1].datePublished);
+            });
+            console.log(ldJSONs);
 
         }
         return items;
-    } catch(e) { }
+    } catch(e) {
+        console.error(e);
+        return [];
+    }
 }
 
 (async () => {
-  // Set up Chromium browser and page.
-  const browser = await puppeteer.launch({headless: true});
-  const page = await browser.newPage();
-  page.setViewport({ width: 1280, height: 926 });
 
-  // Navigate to the example page.
-  await page.goto(URL);
+  let url_list = [];
 
-  // Auto-scroll and extract desired items from the page. Currently set to extract ten items.
-  const result = await scrapeItems(page, MAX_ITEMS);
+  //get all URLS from file
+  const data_link = fs.readFileSync("links.txt");
 
-  // Save extracted items to a new file.
-  //fs.writeFileSync('./items.txt', result.join('\n') + '\n');
+  data_link.toString().split("\n").forEach(function(line, index, arr) {
+      if (index === arr.length - 1 && line === "") { return; }
+      url_list.push(PATH + line.replace('\r',''));
+  });
 
-  let csvContent = "";
+  let result = [];
+  //const proxy_list = ['',..]
+  //Search all URLs
+  for (let i = 0; i < url_list.length; i++) {
 
-  result.forEach(function(rowArray) {
-    let row = rowArray.join(";");
-    csvContent += row + "\r\n";
-});
+      // Set up Chromium browser and page.
+      const browser = await puppeteer.launch({headless: false, args: []});
+      const page = await browser.newPage();
+      page.setViewport({ width: 1280, height: 926 });
 
-    fs.writeFileSync('./items.csv', csvContent + '\n');
-  // Close the browser.
-  await browser.close();
+      console.log(url_list[i]);
+      // Navigate to the main page.
+      await page.goto(url_list[i]);
+      // Auto-scroll and extract desired items from the page.
+      const jsons = await scrapeItems(page, MAX_ITEMS);
+
+      for(const json of jsons){
+          result.push(json);
+      }
+      // Close the browser.
+      await browser.close();
+  }
+  // save result
+  fs.writeFileSync('./items.json', JSON.stringify(result));
 })();
+
