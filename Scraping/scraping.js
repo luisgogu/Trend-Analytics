@@ -3,7 +3,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const cheerio = require('cheerio');
-const MAX_ITEMS = 50
+const MAX_ITEMS = 5
 const URL = 'https://www.pinterest.es/search/pins/?q=chaise%20longue'
 
 
@@ -19,7 +19,7 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
 
         //Scroll to get MAX_ITEMS pins
         while (items.length <= itemCount) {
-
+            console.log(items.length);
             $('[data-test-id="pin"]').each((idx, e) => {
                 if(items.length > itemCount) {return false;}
                 const element = $(e);
@@ -45,13 +45,54 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
 
             const $ = cheerio.load(bodyHTML2);
 
-            $('[data-test-id="CloseupMainPin"]').each((idx, e) => {
-
+            // $('[data-test-id="CloseupMainPin"]').each((idx, e) => {
+            //
+            //     const element = $(e);
+            //     const image = element.find('img');
+            //     items[i].push(image.attr('alt')); //Mas informacion (opcional) + pins asociats
+            //
+            // });
+            let tags = []
+            $('[data-test-id="vase-tag"] > span').each((idx, e) =>{
                 const element = $(e);
-                const image = element.find('img');
-                items[i].push(image.attr('alt')); //Mas informacion (opcional) + pins asociats
-
+                tags.push(element.text());
             });
+            items[i].push(JSON.stringify(tags)); //tags associats
+
+            //items[i].push(parseInt($('[data-test-id="CloseupUserRep"] [role="button"]:nth-child(3) > div').text()));
+
+            //descripcio closeup
+            let description = $('[data-test-id="CloseupDescriptionContainer"]').text();
+            if (description == null || description == ''){
+                items[i].push('None');
+            } else{
+                items[i].push(description);
+            }
+
+            //descripcio oculta
+            let description2 = $('meta[property="description"]').attr('content');
+            if (description2 == null || description2 == ''){
+                items[i].push('None');
+            } else{
+                items[i].push(description2);
+            }
+
+            //seguidors
+            let followers = $('[data-test-id="official-user-attribution"] > div:nth-child(2) :nth-child(2)').text();
+            if (followers == null || followers == ''){
+                items[i].push('None');
+            } else{
+                items[i].push(followers);
+            }
+
+            //data
+            let date = $('meta[property="og:updated_time"]').attr('content');
+            if (date == null || date == ''){
+                items[i].push('None')
+            } else{
+                items[i].push(date);
+            }
+
         }
         return items;
     } catch(e) { }
@@ -59,7 +100,7 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
 
 (async () => {
   // Set up Chromium browser and page.
-  const browser = await puppeteer.launch({headless: false});
+  const browser = await puppeteer.launch({headless: true});
   const page = await browser.newPage();
   page.setViewport({ width: 1280, height: 926 });
 
@@ -70,8 +111,16 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
   const result = await scrapeItems(page, MAX_ITEMS);
 
   // Save extracted items to a new file.
-  fs.writeFileSync('./items.txt', result.join('\n') + '\n');
+  //fs.writeFileSync('./items.txt', result.join('\n') + '\n');
 
+  let csvContent = "";
+
+  result.forEach(function(rowArray) {
+    let row = rowArray.join(";");
+    csvContent += row + "\r\n";
+});
+
+    fs.writeFileSync('./items.csv', csvContent + '\n');
   // Close the browser.
   await browser.close();
 })();
