@@ -3,11 +3,12 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const cheerio = require('cheerio');
-const MAX_ITEMS = 5;
+const MAX_ITEMS = 20;
+const MAX_NUM_FURNITURE = 3;
 const PATH = 'https://www.pinterest.es/search/pins/?q=';
 
 
-async function scrapeItems(page, itemCount, scrollDelay = 800) {
+async function scrapeItems(page, scrollDelay = 800) {
     try {
         const cdp = await page.target().createCDPSession();
         let bodyHTML = await page.evaluate(() => document.documentElement.outerHTML);
@@ -18,11 +19,11 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
         let previousHeight;
 
         //Scroll to get MAX_ITEMS pins
-        while (items.length <= itemCount) {
+        while (items.length <= MAX_ITEMS) {
             console.log(items.length);
             $('[data-test-id="pin"]').each((idx, e) => {
                 let obj = new Object();
-                if(items.length > itemCount) {return false;}
+                if(items.length > MAX_ITEMS) {return false;}
                 const element = $(e);
                 const link = element.find('a[href*="/pin"]');
                 const title = element.find('h3');
@@ -38,7 +39,6 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
             await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
             await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
             await page.waitForTimeout(scrollDelay);
-            console.log(items.length);
         }
 
         //Enter in every pin to get more info
@@ -59,11 +59,13 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
             items[i].tags = tags;
 
             // descripcio closeup
+            console.log($("[id='__PWS_DATA__']"));
             // const pws = JSON.parse($("#__PWS_DATA__").text());
+            
             // const resource = pws.props?.initialReduxState?.resources?.PinResource;
             // if (resource != null) {
             //     description = resource[Object.keys(resource)[0]].data.description;
-            //
+            
             //     if (description == null || description == ''){
             //         items[i].description = 'None';
             //     } else{
@@ -95,13 +97,13 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
                 items[i].date = date;
             }
 
-            const ldJSONs = [];
             $('script[type="application/ld+json"]').each((idx, e) => {
-                console.log($(e).html());
-                ldJSONs.push(JSON.parse($(e).html())[1].datePublished);
+                if (idx == 1 && (JSON.parse($(e).html()) == null || JSON.parse($(e).html()) == '')){
+                    items[i].datePublished = 'None';
+                } else if (idx == 1 && (JSON.parse($(e).html()) != null || JSON.parse($(e).html()) != '')){
+                    items[i].datePublished = JSON.parse($(e).html()).datePublished;
+                }
             });
-            console.log(ldJSONs);
-
         }
         return items;
     } catch(e) {
@@ -115,9 +117,11 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
   let url_list = [];
 
   //get all URLS from file
-  const data_link = fs.readFileSync("links.txt");
+  let data_link = fs.readFileSync("links.txt");
 
-  data_link.toString().split("\n").forEach(function(line, index, arr) {
+  data_link = data_link.toString().split("\n").slice(0,MAX_NUM_FURNITURE)
+
+  data_link.forEach(function(line, index, arr) {
       if (index === arr.length - 1 && line === "") { return; }
       url_list.push(PATH + line.replace('\r',''));
   });
@@ -136,7 +140,7 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
       // Navigate to the main page.
       await page.goto(url_list[i]);
       // Auto-scroll and extract desired items from the page.
-      const jsons = await scrapeItems(page, MAX_ITEMS);
+      const jsons = await scrapeItems(page);
 
       for(const json of jsons){
           result.push(json);
