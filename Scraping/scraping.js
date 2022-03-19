@@ -3,8 +3,8 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const cheerio = require('cheerio');
-const MAX_ITEMS = 20;
-const MAX_NUM_FURNITURE = 3;
+const MAX_ITEMS = 100;
+const MAX_NUM_FURNITURE = 5;
 const PATH = 'https://www.pinterest.es/search/pins/?q=';
 
 
@@ -20,7 +20,7 @@ async function scrapeItems(page, scrollDelay = 800) {
 
         //Scroll to get MAX_ITEMS pins
         while (items.length <= MAX_ITEMS) {
-            console.log(items.length);
+            //console.log(items.length);
             $('[data-test-id="pin"]').each((idx, e) => {
                 let obj = new Object();
                 if(items.length > MAX_ITEMS) {return false;}
@@ -34,6 +34,7 @@ async function scrapeItems(page, scrollDelay = 800) {
                 obj.title = title.text();
                 items.push(obj);
             });
+            //console.log(items.length);
 
             previousHeight = await page.evaluate('document.body.scrollHeight');
             await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
@@ -59,19 +60,20 @@ async function scrapeItems(page, scrollDelay = 800) {
             items[i].tags = tags;
 
             // descripcio closeup
-            console.log($("[id='__PWS_DATA__']"));
-            // const pws = JSON.parse($("#__PWS_DATA__").text());
-            
-            // const resource = pws.props?.initialReduxState?.resources?.PinResource;
-            // if (resource != null) {
-            //     description = resource[Object.keys(resource)[0]].data.description;
-            
-            //     if (description == null || description == ''){
-            //         items[i].description = 'None';
-            //     } else{
-            //         items[i].description = description;
-            //     }
-            // }
+            const pws = JSON.parse($("[id='__PWS_DATA__']")[0].children[0].data);
+            const resource = pws.props?.initialReduxState?.resources?.PinResource;
+
+            if (resource != null) {
+                let description = resource[Object.keys(resource)[0]].data.description;
+                
+                if (description == null || description == ''){
+                    items[i].description = 'None';
+                } else{
+                    items[i].description = description;
+                }
+            } else{
+                items[i].description = 'None';
+            }
 
             //descripcio oculta
             let description2 = $('meta[property="description"]').attr('content');
@@ -84,10 +86,20 @@ async function scrapeItems(page, scrollDelay = 800) {
             //seguidors
             let followers = $('[data-test-id="official-user-attribution"] > div:nth-child(2) :nth-child(2)').text();
             if (followers == null || followers == ''){
-                items[i].followers = 'None';
+                let b = true;
+                // sometimes followers are in other places
+                $('[aria-disabled="false"][role="button"]').each((idx,e) =>{
+                    followers = $(e).text();
+                    if(followers.includes("seguidor")){
+                        items[i].followers = followers;
+                        b = false;
+                    }
+                    
+                });
+                if(b) {items[i].followers = 'None';}
             } else{
                 items[i].followers = followers;
-            }
+            }         
 
             //data
             let date = $('meta[property="og:updated_time"]').attr('content');
@@ -117,9 +129,9 @@ async function scrapeItems(page, scrollDelay = 800) {
   let url_list = [];
 
   //get all URLS from file
-  let data_link = fs.readFileSync("links.txt");
+  let data_link = fs.readFileSync("C:\\Users\\Luis\\Desktop\\Universidad\\Q6\\PE\\Codis\\Trend-Analytics\\Scraping\\links.txt");
 
-  data_link = data_link.toString().split("\n").slice(0,MAX_NUM_FURNITURE)
+  data_link = data_link.toString().split("\n").slice(0,MAX_NUM_FURNITURE);
 
   data_link.forEach(function(line, index, arr) {
       if (index === arr.length - 1 && line === "") { return; }
@@ -127,12 +139,14 @@ async function scrapeItems(page, scrollDelay = 800) {
   });
 
   let result = [];
-  //const proxy_list = ['',..]
+  //const proxy_list = ['...','...'];
   //Search all URLs
   for (let i = 0; i < url_list.length; i++) {
 
       // Set up Chromium browser and page.
-      const browser = await puppeteer.launch({headless: false, args: []});
+      //const proxy = proxy_list[Math.floor(Math.random()*proxy_list.length)];
+
+      const browser = await puppeteer.launch({headless: true, args: []}); //put the proxy var in args
       const page = await browser.newPage();
       page.setViewport({ width: 1280, height: 926 });
 
