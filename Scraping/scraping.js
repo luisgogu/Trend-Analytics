@@ -3,8 +3,8 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const cheerio = require('cheerio');
-const MAX_ITEMS = 100;
-const MAX_NUM_FURNITURE = 5;
+const MAX_ITEMS = 500; // number of pins to extract
+const MAX_NUM_FURNITURE = 100; // number big enough so its not a limitation. Implemented only for testing functionality
 const PATH = 'https://www.pinterest.es/search/pins/?q=';
 
 
@@ -129,7 +129,7 @@ async function scrapeItems(page, scrollDelay = 800) {
   let url_list = [];
 
   //get all URLS from file
-  let data_link = fs.readFileSync("C:\\Users\\Luis\\Desktop\\Universidad\\Q6\\PE\\Codis\\Trend-Analytics\\Scraping\\links.txt");
+  let data_link = fs.readFileSync("links.txt");
 
   data_link = data_link.toString().split("\n").slice(0,MAX_NUM_FURNITURE);
 
@@ -144,9 +144,9 @@ async function scrapeItems(page, scrollDelay = 800) {
   for (let i = 0; i < url_list.length; i++) {
 
       // Set up Chromium browser and page.
-      //const proxy = proxy_list[Math.floor(Math.random()*proxy_list.length)];
+      const proxy = proxy_list[Math.floor(Math.random()*proxy_list.length)];
 
-      const browser = await puppeteer.launch({headless: true, args: []}); //put the proxy var in args
+      const browser = await puppeteer.launch({headless: true, args: [proxy]});
       const page = await browser.newPage();
       page.setViewport({ width: 1280, height: 926 });
 
