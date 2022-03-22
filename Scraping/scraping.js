@@ -3,12 +3,14 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const cheerio = require('cheerio');
-const MAX_ITEMS = 5;
+const MAX_ITEMS = 500; // number of pins to extract
+const MAX_NUM_FURNITURE = 100; // number big enough so its not a limitation. Implemented only for testing functionality
 const PATH = 'https://www.pinterest.es/search/pins/?q=';
 
 
-async function scrapeItems(page, itemCount, scrollDelay = 800) {
+async function scrapeItems(page, url, scrollDelay = 800) {
     try {
+        let id = url.split('?q=')[1];
         const cdp = await page.target().createCDPSession();
         let bodyHTML = await page.evaluate(() => document.documentElement.outerHTML);
         const $ = cheerio.load(bodyHTML);
@@ -18,11 +20,11 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
         let previousHeight;
 
         //Scroll to get MAX_ITEMS pins
-        while (items.length <= itemCount) {
-            console.log(items.length);
+        while (items.length <= MAX_ITEMS) {
+            //console.log(items.length);
             $('[data-test-id="pin"]').each((idx, e) => {
-                let obj = new Object();
-                if(items.length > itemCount) {return false;}
+                let obj = new Object({id:id});
+                if(items.length > MAX_ITEMS) {return false;}
                 const element = $(e);
                 const link = element.find('a[href*="/pin"]');
                 const title = element.find('h3');
@@ -33,12 +35,12 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
                 obj.title = title.text();
                 items.push(obj);
             });
+            //console.log(items.length);
 
             previousHeight = await page.evaluate('document.body.scrollHeight');
             await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
             await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
             await page.waitForTimeout(scrollDelay);
-            console.log(items.length);
         }
 
         //Enter in every pin to get more info
@@ -59,17 +61,20 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
             items[i].tags = tags;
 
             // descripcio closeup
-            // const pws = JSON.parse($("#__PWS_DATA__").text());
-            // const resource = pws.props?.initialReduxState?.resources?.PinResource;
-            // if (resource != null) {
-            //     description = resource[Object.keys(resource)[0]].data.description;
-            //
-            //     if (description == null || description == ''){
-            //         items[i].description = 'None';
-            //     } else{
-            //         items[i].description = description;
-            //     }
-            // }
+            const pws = JSON.parse($("[id='__PWS_DATA__']")[0].children[0].data);
+            const resource = pws.props?.initialReduxState?.resources?.PinResource;
+
+            if (resource != null) {
+                let description = resource[Object.keys(resource)[0]].data.description;
+                
+                if (description == null || description == ''){
+                    items[i].description = 'None';
+                } else{
+                    items[i].description = description;
+                }
+            } else{
+                items[i].description = 'None';
+            }
 
             //descripcio oculta
             let description2 = $('meta[property="description"]').attr('content');
@@ -82,10 +87,20 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
             //seguidors
             let followers = $('[data-test-id="official-user-attribution"] > div:nth-child(2) :nth-child(2)').text();
             if (followers == null || followers == ''){
-                items[i].followers = 'None';
+                let b = true;
+                // sometimes followers are in other places
+                $('[aria-disabled="false"][role="button"]').each((idx,e) =>{
+                    followers = $(e).text();
+                    if(followers.includes("seguidor")){
+                        items[i].followers = followers;
+                        b = false;
+                    }
+                    
+                });
+                if(b) {items[i].followers = 'None';}
             } else{
                 items[i].followers = followers;
-            }
+            }         
 
             //data
             let date = $('meta[property="og:updated_time"]').attr('content');
@@ -95,13 +110,13 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
                 items[i].date = date;
             }
 
-            const ldJSONs = [];
             $('script[type="application/ld+json"]').each((idx, e) => {
-                console.log($(e).html());
-                ldJSONs.push(JSON.parse($(e).html())[1].datePublished);
+                if (idx == 1 && (JSON.parse($(e).html()) == null || JSON.parse($(e).html()) == '')){
+                    items[i].datePublished = 'None';
+                } else if (idx == 1 && (JSON.parse($(e).html()) != null || JSON.parse($(e).html()) != '')){
+                    items[i].datePublished = JSON.parse($(e).html()).datePublished;
+                }
             });
-            console.log(ldJSONs);
-
         }
         return items;
     } catch(e) {
@@ -115,20 +130,24 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
   let url_list = [];
 
   //get all URLS from file
-  const data_link = fs.readFileSync("links.txt");
+  let data_link = fs.readFileSync("links.txt");
 
-  data_link.toString().split("\n").forEach(function(line, index, arr) {
+  data_link = data_link.toString().split("\n").slice(0,MAX_NUM_FURNITURE);
+
+  data_link.forEach(function(line, index, arr) {
       if (index === arr.length - 1 && line === "") { return; }
       url_list.push(PATH + line.replace('\r',''));
   });
 
   let result = [];
-  //const proxy_list = ['',..]
+  //const proxy_list = ['...','...'];
   //Search all URLs
   for (let i = 0; i < url_list.length; i++) {
 
       // Set up Chromium browser and page.
-      const browser = await puppeteer.launch({headless: false, args: []});
+      const proxy = proxy_list[Math.floor(Math.random()*proxy_list.length)];
+
+      const browser = await puppeteer.launch({headless: true, args: [proxy]});
       const page = await browser.newPage();
       page.setViewport({ width: 1280, height: 926 });
 
@@ -136,7 +155,7 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
       // Navigate to the main page.
       await page.goto(url_list[i]);
       // Auto-scroll and extract desired items from the page.
-      const jsons = await scrapeItems(page, MAX_ITEMS);
+      const jsons = await scrapeItems(page, url_list[i]);
 
       for(const json of jsons){
           result.push(json);
@@ -145,6 +164,6 @@ async function scrapeItems(page, itemCount, scrollDelay = 800) {
       await browser.close();
   }
   // save result
-  fs.writeFileSync('./items.json', JSON.stringify(result));
+  fs.writeFileSync('./items2.json', JSON.stringify(result));
 })();
 
