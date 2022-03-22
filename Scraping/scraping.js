@@ -8,8 +8,9 @@ const MAX_NUM_FURNITURE = 100; // number big enough so its not a limitation. Imp
 const PATH = 'https://www.pinterest.es/search/pins/?q=';
 
 
-async function scrapeItems(page, scrollDelay = 800) {
+async function scrapeItems(page, url, scrollDelay = 800) {
     try {
+        let id = url.split('?q=')[1];
         const cdp = await page.target().createCDPSession();
         let bodyHTML = await page.evaluate(() => document.documentElement.outerHTML);
         const $ = cheerio.load(bodyHTML);
@@ -22,7 +23,7 @@ async function scrapeItems(page, scrollDelay = 800) {
         while (items.length <= MAX_ITEMS) {
             //console.log(items.length);
             $('[data-test-id="pin"]').each((idx, e) => {
-                let obj = new Object();
+                let obj = new Object({id:id});
                 if(items.length > MAX_ITEMS) {return false;}
                 const element = $(e);
                 const link = element.find('a[href*="/pin"]');
@@ -154,7 +155,7 @@ async function scrapeItems(page, scrollDelay = 800) {
       // Navigate to the main page.
       await page.goto(url_list[i]);
       // Auto-scroll and extract desired items from the page.
-      const jsons = await scrapeItems(page);
+      const jsons = await scrapeItems(page, url_list[i]);
 
       for(const json of jsons){
           result.push(json);
@@ -163,6 +164,6 @@ async function scrapeItems(page, scrollDelay = 800) {
       await browser.close();
   }
   // save result
-  fs.writeFileSync('./items.json', JSON.stringify(result));
+  fs.writeFileSync('./items2.json', JSON.stringify(result));
 })();
 
