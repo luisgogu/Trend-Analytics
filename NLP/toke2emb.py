@@ -1,27 +1,47 @@
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
+import datetime
 
-import os
-import gensim
+nfollowers = {'k': 1, 'M': 1, 'l': 3, 'n': 6, '0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0}
 
-# Loading 200000 most common words for English (limit for loading time)
-model_en = gensim.models.KeyedVectors.load_word2vec_format('/kaggle/input/fasttext-aligned-word-vectors/wiki.en.align.vec', limit=200000)
-# Loading 200000 most common words for Spanish (limit for loading time)
-model_es = gensim.models.KeyedVectors.load_word2vec_format('/kaggle/input/fasttext-aligned-word-vectors/wiki.es.align.vec', limit=200000)
+# Returns the number of followers in int type
+def get_followers(followers):
+	f = followers.split()
+	last_char = f[0][-1] # Extracts the last character of the number of followers
+
+	if last_char in nfollowers:
+		f = int(f[0][:-nfollowers[last_char]]) 
+
+	else:
+		print('It has occurred some error! Num followers = ', f) # check if there is some error
+
+	return f
 
 
-# això ha de ser un diccionari {'language': model_name}
-model = ['af', 'ar', 'bg', 'bn', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'en', 'es', 'et', 'fa',
-            'fi', 'fr', 'gu', 'he', 'hi', 'hr', 'hu', 'id', 'it', 'ja', 'kn', 'ko', 'lt', 'lv', 
-            'mk', 'ml', 'mr', 'ne', 'nl', 'no', 'pa', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'so',
-            'sq', 'sv', 'sw', 'ta', 'te', 'th', 'tl', 'tr', 'uk', 'ur', 'vi', 'zh-cn', 'zh-tw']
-#af, am, an, ar, as, az, be, bg, bn, br, bs, ca, cs, cy, da, de, dz, el, en, eo, es, et, eu, fa, 
-#fi, fo, fr, ga, gl, gu, he, hi, hr, ht, hu, hy, id, is, it, ja, jv, ka, kk, km, kn, ko, ku, ky,
-#la, lb, lo, lt, lv, mg, mk, ml, mn, mr, ms, mt, nb, ne, nl, nn, no, oc, or, pa, pl, ps, pt, qu, ro, ru, rw, se, si, sk, sl, sq, sr, sv, sw, ta, te, th, tl, tr, ug, uk, ur, vi, vo, wa, xh, zh, zu
 def text2emb(text):
+    lang = langid.classify(text)[0]
     word_tokens = word_tokenize(text)
-    filtered_sentence = [w for w in word_tokens if not w.lower() in stop_words]
-    # lang = language detection
+    filtered_sentence = [w for w in word_tokens if not w.lower() in stop_words[lang]]
     embeddings = [model[lang][token] for token in filtered_sentence if token in model[lang].key_to_index]
     return embeddings
+
+def relevant_info(post):
+    post["followers"] = get_followers(post["followers"])
+    post["datePublished"] = datetime.strptime(post["datePublished"], '%Y-%m-%d %H:%M:%S')
+    new_post = {}
+    
+    for label in ["link", "image", "followers", "datePublished"]:
+        new_post[label] = post[label]
+    
+    return new_post
+
+def clean_posts(posts):
+    result = []
+    for i in posts:
+    
+        emb = []
+        for label in ["title", "description", "description2"]:
+            emb += text2emb(i[label])
+        
+        # Ponderated Avg should go here
+        result.append(relevant_info(i)|{"embedding":np.average(total, axis=0)}))
+    
+    return result
