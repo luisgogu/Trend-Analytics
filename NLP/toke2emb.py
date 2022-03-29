@@ -6,18 +6,23 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import re
+from sklearn.metrics.pairwise import cosine_similarity,cosine_distances
 
-# Language Models fasttext 
-model_ab = ['en', 'es']
-model = {}
-for ab in model_ab:
-    model[ab] = gensim.models.KeyedVectors.load_word2vec_format('/kaggle/input/fasttext-aligned-word-vectors/wiki.{}.align.vec'.format(ab))
+# Language Models fasttext
+def get_models(): 
+	model_ab = ['en', 'es']
+	model = {}
+	for ab in model_ab:
+    	model[ab] = gensim.models.KeyedVectors.load_word2vec_format('/kaggle/input/fasttext-aligned-word-vectors/wiki.{}.align.vec'.format(ab))
+    	return model
 
 # Language stopwords
-nltk.download('stopwords')
-stop_words = {}
-stop_words["en"] = stopwords.words('english')
-stop_words["es"] = stopwords.words('spanish')
+def get_stopwords():
+	nltk.download('stopwords')
+	stop_words = {}
+	stop_words["en"] = stopwords.words('english')
+	stop_words["es"] = stopwords.words('spanish')
+	return stop_words
 
 
 # Language detection
@@ -46,7 +51,7 @@ def text2emb(text):
     embeddings = [model[lang][token] for token in filtered_sentence if token in model[lang].key_to_index]
     return embeddings
 
-def relevant_info(post):
+def relevant_info_post(post):
     post["followers"] = get_followers(post["followers"])
     post["datePublished"] = datetime.strptime(post["datePublished"][:10], '%Y-%m-%d')
     new_post = {}
@@ -55,6 +60,15 @@ def relevant_info(post):
         new_post[label] = post[label]
     
     return new_post
+    
+def relevant_info_product(product):
+    new_product = {}
+    new_product["datePublished"] = datetime.strptime(product["Año de publicación"], '%d/%m/%Y')
+    
+    for label in ["sku", "img_ambiente", "img"]:
+        new_product[label] = product[label]
+    
+    return new_product
 
 
 def clean_posts(posts):
@@ -66,8 +80,30 @@ def clean_posts(posts):
             emb += text2emb(i[label])
         
         # Ponderated Avg should go here
-        info = relevant_info(i)
+        info = relevant_info_post(i)
         info["embedding"] = np.average(emb, axis=0)
         result.append(info)
     
     return result
+    
+def clean_products(products):
+    result = []
+    for i in posts:
+        emb = []
+        for label in ["descripcion", "Material de las patas", "Materiales", "Construcción de la estructura", "Forma del producto", "Material principal", "Color principal", "Colores", "Estancias", "id"]:
+            emb += text2emb(i[label])
+        
+        # Ponderated Avg should go here
+        info = relevant_info_product(i)
+        info["embedding"] = np.average(emb, axis=0)
+        result.append(info)
+    
+    return result
+    
+def similarity():
+    A=np.array([10,3])
+	B=np.array([8,7])
+	result=cosine_similarity(A.reshape(1,-1),B.reshape(1,-1))
+	print(result)
+    
+	
