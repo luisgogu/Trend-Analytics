@@ -11,19 +11,20 @@ from operator import itemgetter
 
 # Language Models fasttext
 def get_models(): 
-	model_ab = ['en', 'es']
-	model = {}
-	for ab in model_ab:
-    	model[ab] = gensim.models.KeyedVectors.load_word2vec_format('/kaggle/input/fasttext-aligned-word-vectors/wiki.{}.align.vec'.format(ab))
-    	return model
+    model_ab = ['en', 'es']
+    model = {}
+    for ab in model_ab:
+        model[ab] = gensim.models.KeyedVectors.load_word2vec_format('/kaggle/input/fasttext-aligned-word-vectors/wiki.{}.align.vec'.format(ab))
+    
+    return model
 
 # Language stopwords
 def get_stopwords():
-	nltk.download('stopwords')
-	stop_words = {}
-	stop_words["en"] = stopwords.words('english')
-	stop_words["es"] = stopwords.words('spanish')
-	return stop_words
+    nltk.download('stopwords')
+    stop_words = {}
+    stop_words["en"] = stopwords.words('english')
+    stop_words["es"] = stopwords.words('spanish')
+    return stop_words
 
 
 # Language detection
@@ -34,15 +35,15 @@ langid.set_languages(language_list)
 nfollow = [('k', 1000, 1), ('M', 1000000, 1), ('millon', 1000000, 0), ('mill.', 1000000, 0), ('mil', 1000, 0)]
 # Returns the number of followers in int type
 def get_followers(followers):
-	if followers == "None":
-		return None
-		
-	f = followers.split()
-	for ab, num, s  in nfollow:
-		if re.search(ab, followers):
-			return int(f[0][:len(f[0])-s])*num
-			
-	return int(re.search(r'\d+', f[0]).group()) #in case of having a new string number abr, only the int number is returned
+    if followers == "None":
+        return None
+    
+    f = followers.split()
+    for ab, num, s  in nfollow:
+        if re.search(ab, followers):
+            return int(f[0][:len(f[0])-s])*num
+    
+    return int(re.search(r'\d+', f[0]).group()) #in case of having a new string number abr, only the int number is returned
 
 
 def text2emb(text):
@@ -103,9 +104,9 @@ def clean_products(products):
     
 def similarity(post, product):
     A=np.array(post)
-	B=np.array(product)
-	sim=cosine_similarity(A.reshape(1,-1),B.reshape(1,-1))
-	return sim
+    B=np.array(product)
+    sim=cosine_similarity(A.reshape(1,-1),B.reshape(1,-1))
+    return sim
 
 def generate_scores(posts, products):
 
@@ -130,7 +131,7 @@ def normalize_pop(posts):
     v = []
     for post in posts:
         v.append(post["followers"])
-    v = numpy.array(v)
+    v = np.array(v)
     normalized_v = v/np.linalg.norm(v)
 
     for i in range(len(posts)):
