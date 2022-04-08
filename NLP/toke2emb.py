@@ -7,6 +7,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import re
 from sklearn.metrics.pairwise import cosine_similarity,cosine_distances
+from operator import itemgetter
 
 # Language Models fasttext
 def get_models(): 
@@ -105,5 +106,34 @@ def similarity(post, product):
 	B=np.array(product)
 	sim=cosine_similarity(A.reshape(1,-1),B.reshape(1,-1))
 	return sim
+
+def generate_scores(posts, products):
+
+    for post in posts:
+
+        scores = []
+
+        for product in products:
+
+            sim = similarity(post["embedding"], product["embedding"])
+            scores.append((post["sku"], sim))
+        
+        post["ranking"] = sorted(scores,key=itemgetter(1), reverse=True)[:10]
+
+    return posts
+
+def nor_malize_pop(posts):
+
+    v = np.random.rand(10)
+    normalized_v = v/np.linalg.norm(v)
     
-	
+    v = []
+    for post in posts:
+        v.append(post["followers"])
+    v = numpy.array(v)
+    normalized_v = v/np.linalg.norm(v)
+
+    for i in range(len(posts)):
+        posts[i]["followers"] = normalized_v[i]
+    
+    return posts
