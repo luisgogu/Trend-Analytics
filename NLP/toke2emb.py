@@ -122,7 +122,7 @@ def generate_scores(posts, products):
 
     return posts
 
-def nor_malize_pop(posts):
+def normalize_pop(posts):
 
     v = np.random.rand(10)
     normalized_v = v/np.linalg.norm(v)
