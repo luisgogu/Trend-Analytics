@@ -122,7 +122,7 @@ def generate_scores(posts, products):
 
     return posts
 
-def nor_malize_pop(posts):
+def normalize_pop(posts):
 
     v = np.random.rand(10)
     normalized_v = v/np.linalg.norm(v)
@@ -137,3 +137,18 @@ def nor_malize_pop(posts):
         posts[i]["followers"] = normalized_v[i]
     
     return posts
+
+# Generate dictionary of products with 0 score
+def generate_dict(products):
+    d = {}
+    for product in products:
+        d[product["sku"]] = 0
+    return d
+
+# Compute scores for each product in dictionary and sort them
+def compute_scores(posts, products, d):
+    for post in posts:
+        for product in post["ranking"]:
+            d[product[0]] += product[1] * post["followers"]
+    return sorted(d.items(), key=itemgetter(1), reverse=True)
+
