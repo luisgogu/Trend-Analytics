@@ -88,7 +88,7 @@ def clean_posts(posts):
     
 def clean_products(products):
     result = []
-    for i in posts:
+    for i in products:
         emb = []
         for label in ["descripcion", "Material de las patas", "Materiales", "Construcción de la estructura", "Forma del producto", "Material principal", "Color principal", "Colores", "Estancias", "id"]:
             emb += text2emb(i[label])
@@ -100,10 +100,10 @@ def clean_products(products):
     
     return result
     
-def similarity():
-    A=np.array([10,3])
-	B=np.array([8,7])
-	result=cosine_similarity(A.reshape(1,-1),B.reshape(1,-1))
-	print(result)
+def similarity(post, product):
+    A=np.array(post)
+	B=np.array(product)
+	sim=cosine_similarity(A.reshape(1,-1),B.reshape(1,-1))
+	return sim
     
 	
