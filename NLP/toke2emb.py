@@ -11,19 +11,19 @@ from operator import itemgetter
 
 # Language Models fasttext
 def get_models(): 
-	model_ab = ['en', 'es']
-	model = {}
-	for ab in model_ab:
-    	model[ab] = gensim.models.KeyedVectors.load_word2vec_format('/kaggle/input/fasttext-aligned-word-vectors/wiki.{}.align.vec'.format(ab))
-    	return model
+    model_ab = ['en', 'es']
+    model = {}
+    for ab in model_ab:
+        model[ab] = gensim.models.KeyedVectors.load_word2vec_format('/kaggle/input/fasttext-aligned-word-vectors/wiki.{}.align.vec'.format(ab))
+    return model
 
 # Language stopwords
 def get_stopwords():
-	nltk.download('stopwords')
-	stop_words = {}
-	stop_words["en"] = stopwords.words('english')
-	stop_words["es"] = stopwords.words('spanish')
-	return stop_words
+    nltk.download('stopwords')
+    stop_words = {}
+    stop_words["en"] = stopwords.words('english')
+    stop_words["es"] = stopwords.words('spanish')
+    return stop_words
 
 
 # Language detection
@@ -45,7 +45,7 @@ def get_followers(followers):
 	return int(re.search(r'\d+', f[0]).group()) #in case of having a new string number abr, only the int number is returned
 
 
-def text2emb(text):
+def text2emb(text, stop_words, model):
     lang = langid.classify(text)[0]
     word_tokens = word_tokenize(text)
     filtered_sentence = [w for w in word_tokens if not w.lower() in stop_words[lang]]
@@ -72,13 +72,13 @@ def relevant_info_product(product):
     return new_product
 
 
-def clean_posts(posts):
+def clean_posts(posts, stop_words, model):
     result = []
     for i in posts:
     
         emb = []
         for label in ["title", "description", "description2"]:
-            emb += text2emb(i[label])
+            emb += text2emb(i[label], stop_words, model)
         
         # Ponderated Avg should go here
         info = relevant_info_post(i)
@@ -87,12 +87,12 @@ def clean_posts(posts):
     
     return result
     
-def clean_products(products):
+def clean_products(products, stop_words, model):
     result = []
     for i in products:
         emb = []
         for label in ["descripcion", "Material de las patas", "Materiales", "Construcción de la estructura", "Forma del producto", "Material principal", "Color principal", "Colores", "Estancias", "id"]:
-            emb += text2emb(i[label])
+            emb += text2emb(i[label], stop_words, model)
         
         # Ponderated Avg should go here
         info = relevant_info_product(i)
@@ -103,9 +103,9 @@ def clean_products(products):
     
 def similarity(post, product):
     A=np.array(post)
-	B=np.array(product)
-	sim=cosine_similarity(A.reshape(1,-1),B.reshape(1,-1))
-	return sim
+    B=np.array(product)
+    sim=cosine_similarity(A.reshape(1,-1),B.reshape(1,-1))
+    return sim
 
 def generate_scores(posts, products):
 
