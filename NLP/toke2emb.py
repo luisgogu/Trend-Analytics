@@ -34,15 +34,15 @@ langid.set_languages(language_list)
 nfollow = [('k', 1000, 1), ('M', 1000000, 1), ('millon', 1000000, 0), ('mill.', 1000000, 0), ('mil', 1000, 0)]
 # Returns the number of followers in int type
 def get_followers(followers):
-	if followers == "None":
-		return None
-		
-	f = followers.split()
-	for ab, num, s  in nfollow:
-		if re.search(ab, followers):
-			return int(f[0][:len(f[0])-s])*num
-			
-	return int(re.search(r'\d+', f[0]).group()) #in case of having a new string number abr, only the int number is returned
+    if followers == "None":
+        return None
+    
+    f = followers.split()
+    for ab, num, s  in nfollow:
+        if re.search(ab, followers):
+            return int(f[0][:len(f[0])-s])*num
+    
+    return int(re.search(r'\d+', f[0]).group()) #in case of having a new string number abr, only the int number is returned
 
 
 def text2emb(text, stop_words, model):
@@ -130,10 +130,25 @@ def normalize_pop(posts):
     v = []
     for post in posts:
         v.append(post["followers"])
-    v = numpy.array(v)
+    v = np.array(v)
     normalized_v = v/np.linalg.norm(v)
 
     for i in range(len(posts)):
         posts[i]["followers"] = normalized_v[i]
     
     return posts
+
+# Generate dictionary of products with 0 score
+def generate_dict(products):
+    d = {}
+    for product in products:
+        d[product["sku"]] = 0
+    return d
+
+# Compute scores for each product in dictionary and sort them
+def compute_scores(posts, products, d):
+    for post in posts:
+        for product in post["ranking"]:
+            d[product[0]] += product[1] * post["followers"]
+    return sorted(d.items(), key=itemgetter(1), reverse=True)
+
