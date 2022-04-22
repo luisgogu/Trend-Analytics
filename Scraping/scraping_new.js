@@ -3,53 +3,47 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const cheerio = require('cheerio');
-const MAX_ITEMS = 200; // number of pins to extract
-const MAX_NUM_FURNITURE = 1; // number big enough so its not a limitation. Implemented only for testing functionality
+const MAX_ITEMS = 500; // number of pins to extract
+const NUM_SCROLL = 60; // number of scrolls
 const PATH = 'https://www.pinterest.es/search/pins/?q=';
 
 
 async function scrapeItems(page, url, scrollDelay = 800) {
         let id = url.split('?q=')[1];
         const cdp = await page.target().createCDPSession();
-        let bodyHTML = await page.evaluate(() => document.documentElement.outerHTML);
-        let $ = cheerio.load(bodyHTML);
 
         let items = [];
 
         let previousHeight;
 
-        //Scroll to get MAX_ITEMS pins
-        while (items.length <= MAX_ITEMS) {
-            //console.log(items.length);
-            $('[data-test-id="pin"]').each((idx, e) => {
-                let obj = new Object({id:id});
-                if(items.length > MAX_ITEMS) {return false;}
-                const element = $(e);
-                const link = element.find('a[href*="/pin"]');
-                const title = element.find('h3');
-                const image = element.find('img');
-
-                obj.link = "https://www.pinterest.es"+link.attr('href');
-                obj.image = image.attr('src');
-                obj.title = title.text();
-
-                if (items.filter(e => e.link === obj.link).length == 0) {
-                    items.push(obj);
-                }
-
-                //console.log(idx, items.length, obj.title)
-                
-            });
-            //console.log(items.length);
-
+        for (let i = 0; i < NUM_SCROLL; i++) {
             previousHeight = await page.evaluate('document.body.scrollHeight');
             await page.evaluate('window.scrollTo(0, document.body.scrollHeight)');
             await page.waitForFunction(`document.body.scrollHeight > ${previousHeight}`);
             await page.waitForTimeout(scrollDelay);
-
-            bodyHTML = await page.evaluate(() => document.documentElement.outerHTML);
-            $ = cheerio.load(bodyHTML);
         }
+
+        let bodyHTML = await page.evaluate(() => document.documentElement.outerHTML);
+        let $ = cheerio.load(bodyHTML);
+
+        $('[data-test-id="pin"]').each((idx, e) => {
+            if(items.length > MAX_ITEMS) {return false;}
+                
+            let obj = new Object({id:id});
+                
+            const element = $(e);
+            const link = element.find('a[href*="/pin"]');
+            const title = element.find('h3');
+            const image = element.find('img');
+
+            obj.link = "https://www.pinterest.es"+link.attr('href');
+            obj.image = image.attr('src');
+            obj.title = title.text();
+
+            items.push(obj);
+
+            //console.log(idx, items.length, obj.title)     
+        });
 
         //Enter in every pin to get more info
         for (let i = 0; i < items.length; i++) {
@@ -158,7 +152,7 @@ async function scrapeItems(page, url, scrollDelay = 800) {
   for (let i = 0; i < data_link.length; i++) {
       const line = data_link[i];
       if (line === "") { continue; }
-      const file_name = `./items_new/${line}.${Math.floor(Date.now()/(24*60*60*1000))}.json`;
+      const file_name = `./items2/${line}.${Math.floor(Date.now()/(24*60*60*1000))}.json`;
       if (fs.existsSync(file_name)) {
           continue;
       }
