@@ -3,7 +3,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const cheerio = require('cheerio');
-const MAX_ITEMS = 500; // number of pins to extract
+const MAX_ITEMS = 600; // number of pins to extract
 const NUM_SCROLL = 60; // number of scrolls
 const PATH = 'https://www.pinterest.es/search/pins/?q=';
 
