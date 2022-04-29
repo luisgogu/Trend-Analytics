@@ -46,9 +46,11 @@ def get_followers(followers):
 
 
 def text2emb(text, stop_words, model):
+    if text == None: 
+        return []
     lang = langid.classify(text)[0]
     word_tokens = word_tokenize(text)
-    filtered_sentence = [w for w in word_tokens if not w.lower() in stop_words[lang]]
+    filtered_sentence = [w.lower() for w in word_tokens if not w.lower() in stop_words[lang]]
     embeddings = [model[lang][token] for token in filtered_sentence if token in model[lang].key_to_index]
     return embeddings
 
@@ -64,7 +66,8 @@ def relevant_info_post(post):
     
 def relevant_info_product(product):
     new_product = {}
-    new_product["datePublished"] = datetime.strptime(product["Año de publicación"], '%d/%m/%Y')
+    if product["Año de publicación"] != None:
+        new_product["datePublished"] = datetime.strptime(product["Año de publicación"], '%d/%m/%y')
     
     for label in ["sku", "img_ambiente", "img"]:
         new_product[label] = product[label]
@@ -102,6 +105,8 @@ def clean_products(products, stop_words, model):
     return result
     
 def similarity(post, product):
+    if np.isnan(product).any():
+        return np.array([[0]])
     A=np.array(post)
     B=np.array(product)
     sim=cosine_similarity(A.reshape(1,-1),B.reshape(1,-1))
@@ -113,10 +118,14 @@ def generate_scores(posts, products):
 
         scores = []
 
+        if np.isnan(post["embedding"]).any():
+            post["ranking"] = None
+            continue
+
         for product in products:
 
             sim = similarity(post["embedding"], product["embedding"])
-            scores.append((post["sku"], sim))
+            scores.append((product["sku"], sim))
         
         post["ranking"] = sorted(scores,key=itemgetter(1), reverse=True)[:10]
 
@@ -124,17 +133,24 @@ def generate_scores(posts, products):
 
 def normalize_pop(posts):
 
-    v = np.random.rand(10)
-    normalized_v = v/np.linalg.norm(v)
+    #v = np.random.rand(10)
+    #normalized_v = v/np.linalg.norm(v)
     
     v = []
     for post in posts:
-        v.append(post["followers"])
+        f = post["followers"]
+        if f in [np.nan, None]:  ## comentar aixo
+            v.append(0)
+        else:
+            v.append(f)
     v = np.array(v)
     normalized_v = v/np.linalg.norm(v)
 
     for i in range(len(posts)):
-        posts[i]["followers"] = normalized_v[i]
+        if normalized_v[i] == 0: ## comentar aixo
+            posts[i]["followers"] = 1
+        else:
+            posts[i]["followers"] = normalized_v[i]
     
     return posts
 
