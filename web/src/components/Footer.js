@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Button } from './Button'
+import { Button_results } from './Button'
 import './Footer.css'
 
 function Footer() {
@@ -16,9 +16,9 @@ function Footer() {
             <div className='input-areas'>
                 <form>
                     <input type="email" name="email" placeholder='Your email' className='footer-input'/>
-                    <Button buttonStyle = 'btn--outline'>
+                    <Button_results buttonStyle = 'btn--outline'>
                         Contact
-                    </Button>
+                    </Button_results>
                 </form>
             </div>
         </section>
