@@ -11,7 +11,7 @@ from operator import itemgetter
 
 # Language Models fasttext
 def get_models(): 
-    model_ab = ['en', 'es']
+    model_ab = ['en', 'es', 'fr', 'pt']
     model = {}
     for ab in model_ab:
         model[ab] = gensim.models.KeyedVectors.load_word2vec_format('/kaggle/input/fasttext-aligned-word-vectors/wiki.{}.align.vec'.format(ab))
@@ -23,6 +23,8 @@ def get_stopwords():
     stop_words = {}
     stop_words["en"] = stopwords.words('english')
     stop_words["es"] = stopwords.words('spanish')
+    stop_words["fr"] = stopwords.words('french')
+    stop_words["pt"] = stopwords.words('portuguese')
     return stop_words
 
 
@@ -36,7 +38,7 @@ nfollow = [('k', 1000, 1), ('M', 1000000, 1), ('millon', 1000000, 0), ('mill.', 
 def get_followers(followers):
     if followers == "None":
         return None
-    
+
     f = followers.split()
     for ab, num, s  in nfollow:
         if re.search(ab, followers):
@@ -59,7 +61,7 @@ def relevant_info_post(post):
     post["datePublished"] = datetime.strptime(post["datePublished"][:10], '%Y-%m-%d')
     new_post = {}
     
-    for label in ["link", "image", "followers", "datePublished"]:
+    for label in ["id", "link", "image", "followers", "datePublished", "authorName", "authorProfile"]:
         new_post[label] = post[label]
     
     return new_post
@@ -69,7 +71,7 @@ def relevant_info_product(product):
     if product["Año de publicación"] != None:
         new_product["datePublished"] = datetime.strptime(product["Año de publicación"], '%d/%m/%y')
     
-    for label in ["sku", "img_ambiente", "img"]:
+    for label in ["sku", "img_ambiente", "img", "id"]:
         new_product[label] = product[label]
     
     return new_product
@@ -80,8 +82,11 @@ def clean_posts(posts, stop_words, model):
     for i in posts:
     
         emb = []
-        for label in ["title", "description", "description2"]:
+        for label in ["id", "title"]: # "description", "description2"
             emb += text2emb(i[label], stop_words, model)
+
+        for t in i["tags"]:
+            emb += text2emb(t, stop_words, model)
         
         # Ponderated Avg should go here
         info = relevant_info_post(i)
@@ -112,7 +117,7 @@ def similarity(post, product):
     sim=cosine_similarity(A.reshape(1,-1),B.reshape(1,-1))
     return sim
 
-def generate_scores(posts, products):
+def generate_scores(posts, products, key_search):
 
     for post in posts:
 
@@ -124,6 +129,7 @@ def generate_scores(posts, products):
 
         for product in products:
 
+            #if product["id"] == key_search:
             sim = similarity(post["embedding"], product["embedding"])
             scores.append((product["sku"], sim))
         
@@ -165,6 +171,6 @@ def generate_dict(products):
 def compute_scores(posts, products, d):
     for post in posts:
         for product in post["ranking"]:
-            d[product[0]] += product[1] * post["followers"]
+            d[product[0]] += product[1] #* post["followers"]
     return sorted(d.items(), key=itemgetter(1), reverse=True)
 
