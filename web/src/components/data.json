@@ -1,0 +1,24 @@
+{
+    "products": [
+        {
+        "product": "Chair",
+        "popularity": 9000,
+        "url": "https://media.kavehome.com/media/cache/15/f6/15f657204ba6f01282f1e9bab4893e40.jpg"
+    },
+    {
+        "product": "Sofa",
+        "popularity": 800,
+        "url": "https://media.kavehome.com/media/cache/0e/c1/0ec1a5841ed00d2c1a6012f7ad3f556e.jpg"
+    },
+    {
+        "product": "Bed",
+        "popularity": 400,
+        "url": "https://media.kavehome.com/media/cache/8b/71/8b71fd7d1ffa30158b07aa536a544682.jpg"
+    },
+    {
+        "product": "Table",
+        "popularity": 800,
+        "url": "https://media.kavehome.com/media/cache/a5/2a/a52a82dd48af7b3aa9d0dd38bb31757c.jpg"
+    }
+    ]
+}

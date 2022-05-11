@@ -3,6 +3,7 @@ import DateRangePicker from "react-daterange-picker";
 import "react-daterange-picker/dist/css/react-calendar.css";
 import originalMoment from "moment";
 import { extendMoment } from "moment-range";
+
 const moment = extendMoment(originalMoment);
 
 var a = [[],[]]
@@ -14,7 +15,7 @@ class Example extends React.Component {
 
     this.state = {
       isOpen: true,
-      value: moment.range(today.clone().subtract(7, "days"), today.clone())
+      value: moment.range(today.clone().subtract(7, "days"), today.clone()) 
     };
   }
 
@@ -61,9 +62,9 @@ class Example extends React.Component {
       <div>
         <div>{this.renderSelectionValue()}</div>
 
-        <div>
+        <div >
           <form
-            onClick={this.onToggle}
+            onClick={this.onToggle} 
           />
         </div>
 
@@ -72,6 +73,7 @@ class Example extends React.Component {
             value={this.state.value}
             onSelect={this.onSelect}
             singleDateRange={true}
+            
           />
         )}
       </div>
