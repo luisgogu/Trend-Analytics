@@ -51,3 +51,13 @@ export const Button_video = ({
         </Link>
     )
 };
+export const Button_products = ({
+    children,
+    type,
+    onClick,
+    buttonStyle,
+    buttonSize
+}) => {
+    const checkButtonStyle = STYLES.includes(buttonStyle) ? buttonStyle : STYLES[0]
+    const checkButtonSize = SIZES.includes(buttonSize) ? buttonSize : SIZES[0]
+};
