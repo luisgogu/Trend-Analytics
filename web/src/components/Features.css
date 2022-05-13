@@ -1,0 +1,11 @@
+.btn-filter{
+    background-color: #c65653;
+    color:white;
+    padding: 8px 20px;
+    border-color: #c65653;
+    border-style: solid;
+    border-width: 3px;
+    font-size: 20px;
+    transition: all 0.3s ease-out;
+    display: flex;
+}

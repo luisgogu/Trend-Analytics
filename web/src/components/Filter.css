@@ -1,0 +1,36 @@
+.title-text{
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+}
+.btn-group{
+    display: flex;
+    flex-flow: row;
+    padding: 2px;
+    align-items: center;
+    align-content: center;
+}
+.product{
+    background: white;
+    opacity: 90%;
+    display: contents;
+    align-content: left;
+    align-items: left;
+}
+.btn--prod{
+    background-color: #c65653;
+    color:white;
+    padding: 8px 20px;
+    border-color: #c65653;
+    border-style: solid;
+    border-width: 3px;
+    font-size: 20px;
+    transition: all 0.3s ease-out;
+    display: flex;
+}
+.container{
+    display: contents;
+    align-content: center;
+}
