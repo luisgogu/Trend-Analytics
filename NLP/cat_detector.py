@@ -34,7 +34,10 @@ known = {
     'gris': 'Color', 'mostaza': 'Color', 'lila': 'Color', 'multicolor': 'Color', 'plateado': 'Color',
     'natural': 'Color', 'marrón': 'Color', 'recibidor': 'Habitación', 'trabajo': 'Habitación',
     'comedor': 'Habitación', 'dormitorio': 'Habitación', 'cocina': 'Habitación', 'salón': 'Habitación',
-    'baño': 'Habitación', 'terraza': 'Habitación'
+    'baño': 'Habitación', 'terraza': 'Habitación','vintage': 'Estilo','ecléctico': 'Estilo',
+    'oriental': 'Estilo','escandinavo': 'Estilo','industrial': 'Estilo','minimalista': 'Estilo',
+    'romántico': 'Estilo','moderno': 'Estilo','bohemio': 'Estilo','rústico': 'Estilo',
+    'nórdico': 'Estilo','náutico': 'Estilo','clásico': 'Estilo'
 }
 
 def load_knn(path):
