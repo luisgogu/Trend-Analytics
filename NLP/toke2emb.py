@@ -8,7 +8,6 @@ from nltk.corpus import stopwords
 import re
 import string
 from sklearn.metrics.pairwise import cosine_similarity,cosine_distances
-from googletrans import Translator
 from operator import itemgetter
 
 #-------------------------------Model2-------------------------------
@@ -21,12 +20,10 @@ knn = det.load_knn("second_model.sav")
 # Language Models fasttext
 def get_models(): 
     model_ab = ['en', 'es', 'fr', 'pt', 'it']
-    #model_ab = ['fr', 'pt', 'it']
-    #model_ab = ['en', 'es']
+
     model = {}
     for ab in model_ab:
         model[ab] = gensim.models.KeyedVectors.load_word2vec_format('/kaggle/input/fasttext-aligned-word-vectors/wiki.{}.align.vec'.format(ab))
-    #model['de'] = gensim.models.KeyedVectors.load_word2vec_format('/kaggle/input/alemanyalignedvec/wiki.de.align.vec')
     return model
 
 # Language stopwords
@@ -38,7 +35,6 @@ def get_stopwords():
     stop_words["fr"] = stopwords.words('french')
     stop_words["pt"] = stopwords.words('portuguese')
     stop_words["it"] = stopwords.words('italian')
-    #stop_words["de"] = stopwords.words('german')
     return stop_words
 
 
@@ -47,81 +43,11 @@ language_list = ['en','es', 'fr', 'pt', 'it']
 langid.set_languages(language_list)
 
 # Traductor
-translator = {
-'sofas': 'sofás',
-'sofa': 'sofá',
-'couch': 'sofá',
-'chairs': 'mesa',
-'armchair': 'mesas',
-'armchairs': 'silla',
-'rug': 'sillas',
-'carpets': 'sillón',
-'vase': 'sillones',
-'vases': 'cama',
-'shelving': 'camas',
-'shelves': 'alfombra',
-'bookstore': 'alfombras',
-'libraries': 'jarrón',
-'desk': 'jarrones',
-'desks': 'estantería',
-'mattress': 'estanterías',
-'mattresses': 'librería',
-'piece of furniture': 'librerías',
-'furniture': 'escritorio',
-'library': 'escritorios',
-'run': 'colchón',
-'letter': 'colchones',
-'small table': 'cómodas',
-'meson': 'cómoda',
-'mesons': 'otomanas',
-'stool': 'otomana',
-'stools': 'mueble',
-'mirror': 'muebles',
-'mirrors': 'biblioteca',
-'closet': 'bibliotecas',
-'wardrove': 'futón',
-'banks': 'futones',
-'organizer': 'litera',
-'organizers': 'literas',
-'coat rack': 'mesita',
-'coat hangers': 'mesitas',
-'dresser': 'mesón',
-'players': 'mesones',
-'lamp': 'taburete',
-'lamps': 'taburetes',
-'seat': 'espejo',
-'seats': 'espejos',
-'changer': 'armario',
-'changers': 'armarios',
-'cushion': 'banco',
-'cushions': 'bancos',
-'picture': 'organizador',
-'jug': 'organizadores',
-'jugs': 'perchero',
-'hanger': 'percheros',
-'hangers': 'tocador',
-'seating': 'tocadores',
-'watch': 'somier',
-'watches': 'somieres',
-'flowerpot': 'lámpara',
-'pots': 'lámparas',
-'deck chair': 'butaca',
-'loungers': 'butacas',
-'paper': 'cambiador',
-'papers': 'cambiadores',
-'dough': 'chaiselongue',
-'baskets': 'chaiselongues',
-'the road': 'cojín',
-'cradle': 'cojines',
-'cribs': 'cuadro',
-'trone': 'cuadros',
-'screen': 'jarra',
-'biples': 'jarras',
-'table': 'mesa'}
+translator = {'sofás': 'sofá', 'mesas': 'mesa', 'sillas': 'silla', 'sillones': 'sillón', 'camas': 'cama', 'alfombras': 'alfombra', 'jarrones': 'jarrón', 'estanterías': 'estantería', 'escritorios': 'escritorio', 'colchones': 'colchón', 'muebles': 'mueble', 'taburetes': 'taburete', 'espejos': 'espejo', 'armarios':'armario', 'percheros': 'perchero', 'lámparas': 'lámpara', 'butacas': 'butaca', 'cambiadores': 'cambiador', 'chaiselongues': 'chaiselongue', 'cojines': 'cojín', 'cuadros': 'cuadro', 'jarras': 'jarra', 'colgadores': 'colgador', 'asientos': 'asiento', 'relojes': 'reloj', 'papeles': 'papel', 'cestos': 'cesto', 'cesta': 'cesto', 'cestas': 'cesto', 'sofas': 'sofás','sofa': 'sofá','couch': 'sofá','chairs': 'silla', 'chair': 'silla', 'armchair': 'butaca','armchairs': 'butaca','rug': 'alfombra','carpets': 'alfombra','vase': 'jarrón','vases': 'jarrones','shelving': 'estantería','shelves': 'estantería','bookstore': 'estantería','libraries': 'estantería','desk': 'escritorio','desks': 'escritorio','mattress': 'colchon','mattresses': 'colchon', 'furniture': 'mueble','library': 'estantería', 'stool': 'taburete','stools': 'taburetes','mirror': 'espejo','mirrors': 'espejo','closet': 'armario','wardrove': 'armario', 'dresser': 'cómoda','lamp': 'lámpara','lamps': 'lámpara','seat': 'silla','seats': 'silla','changer': 'armario','changers': 'armarios','cushion': 'cojín','cushions': 'cojín','picture': 'cuadro','jug': 'jarra','jugs': 'jarra','hanger': 'perchero','hangers': 'perchero','seating': 'butaca','paper': 'papel','papers': 'papel','baskets': 'cesto','table': 'mesa', 'pillow': 'almohada', 'almohadas': 'almohada', 'pillows': 'almohada', 'drawer': 'cajón', 'cajones': 'cajón', 'drawers': 'cajón', 'zapateros': 'zapatero', 'shoerack': 'zapatero', 'shoeracks': 'zapatero'}
 
 
 def classify_tags(labels, emb, words, model):
-    mat, hab, col, est, mueb = [], [], [], [], []
+    mat, hab, col, est, mueb, form = [], [], [], [], [], []
     for tag, e, w in zip(labels, emb, words):
         if tag == 'Color':
             col.append(e)
@@ -131,13 +57,15 @@ def classify_tags(labels, emb, words, model):
             est.append(e)
         elif tag == 'Material':
             mat.append(e)
+        elif tag == 'Forma':
+            form.append(e)
         elif tag == 'Mueble':
-            if w[1] in translator:
+            if w[0] in translator:
                 mueb.append(translator[w[0]])
             else:
                 mueb.append(w[0])
 
-    return mat, hab, col, est, mueb
+    return mat, hab, col, est, form, mueb
 
 
 nfollow = [('k', 1000, 1), ('M', 1000000, 1), ('millon', 1000000, 0), ('mill.', 1000000, 0), ('mil', 1000, 0)]
@@ -214,7 +142,7 @@ def clean_posts(posts, stop_words, model):
         emb = []
         embedding = []
         labels = []
-        mat, mat2, hab, hab2, col, col2, est, est2, mueb, mueb2 = [], [], [], [], [], [], [], [], [], []
+        mat, mat2, hab, hab2, col, col2, est, est2, form, form2, mueb, mueb2 = [], [], [], [], [], [], [], [], [], [], [], []
 
         for label in ["id", "title"]: # "description", "description2"
             emb += text2emb(i[label], stop_words, model)
@@ -228,26 +156,41 @@ def clean_posts(posts, stop_words, model):
             labels = det.get_attr_cat(words1, model, knn, known)
             words = token2emb(words1, model)
             emb += words
-            mat, hab, col, est, mueb = classify_tags(labels, words, words1, model)
+            mat2, hab2, col2, est2, form2, mueb2 = classify_tags(labels, words, words1, model)
+            mat += mat2
+            hab += hab2
+            col += col2
+            est += est2
+            form += form2
+            mueb += mueb2
 
         for label in ["title", "description", "description2"]:
             words1 = text2token(i[label], stop_words)
             labels = det.get_attr_cat(words1, model, knn, known)
             words = token2emb(words1, model)
-            mat2, hab2, col2, est2, mueb2 = classify_tags(labels, words, words1, model)
+            mat2, hab2, col2, est2, form2, mueb2 = classify_tags(labels, words, words1, model)
+            mat += mat2
+            hab += hab2
+            col += col2
+            est += est2
+            form += form2
+            mueb += mueb2
 
-        if mat != [] or mat2 != []:
-            mat = np.average(mat+mat2, axis=0)
+        if mat != []:
+            mat = np.average(mat, axis=0)
         embedding.append(mat)
-        if hab != [] or hab2 != []:
-            hab = np.average(hab+hab2, axis=0)
+        if hab != []:
+            hab = np.average(hab, axis=0)
         embedding.append(hab)
-        if col != [] or col2 != []:
-            col = np.average(col+col2, axis=0)
+        if col != []:
+            col = np.average(col, axis=0)
         embedding.append(col)
-        if est != [] or est2 != []:
-            est = np.average(est+est2, axis=0)
+        if est != []:
+            est = np.average(est, axis=0)
         embedding.append(est)
+        if form != []:
+            form = np.average(form, axis=0)
+        embedding.append(form)
 
         if emb != []:
             emb = np.average(emb, axis=0)
@@ -256,7 +199,7 @@ def clean_posts(posts, stop_words, model):
         # Ponderated Avg should go here
         info = relevant_info_post(i)
         info["embedding"] = embedding
-        info["category"] = mueb+mueb2
+        info["category"] = mueb
         result.append(info)
     
     return result
@@ -289,6 +232,13 @@ def clean_products(products, stop_words, model):
 
         emb = []
         for label in ["Estilo principal"]:
+            emb += text2emb(i[label], stop_words, model)
+        if emb != []:
+            emb = np.average(emb, axis=0)
+        embedding.append(emb)
+
+        emb = []
+        for label in ["Forma del producto"]:
             emb += text2emb(i[label], stop_words, model)
         if emb != []:
             emb = np.average(emb, axis=0)
@@ -400,6 +350,6 @@ def generate_dict(products):
 def compute_scores(posts, products, d):
     for post in posts:
         for product in post["ranking"]:
-            d[product[0]] += product[1] #* post["followers"]
+            d[product[0]] += product[2] #* post["followers"]
     return sorted(d.items(), key=itemgetter(1), reverse=True)
 
