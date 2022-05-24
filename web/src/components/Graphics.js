@@ -4,6 +4,8 @@ import Checkbox from "./Checkbox";
 import React from 'react';
 import "./Styles.css";
 import DateRangeExample from "./DateRangeExample";
+import Chart from "./Chart";
+import "./Graphics.css"
 
 
 var a = []
@@ -105,14 +107,14 @@ class App extends React.Component {
     return (
       <div className="container">
         <div className="row mt-5">
-          <div className="col-sm-12">
+          <div className="filter">
             <form onSubmit={this.handleFormSubmit}>
               <div>
                 Filter by product category
               </div>
               {this.createCheckboxes()}
 
-              <div className="form-group mt-2">
+              <div className="form-group-mt-2">
                 <button
                   type="button"
                   className="btn btn-outline-primary mr-2"
@@ -127,13 +129,17 @@ class App extends React.Component {
                 >
                   Deselect All
                 </button>
-                <DateRangeExample />
-                <button type="submit" className="btn btn-primary" >
+                
+                  <DateRangeExample />
+                <button type="submit" className="btn-filter" >
                   Filter
                 </button>
               </div>
             </form>
           </div>
+        </div>
+        <div className="chart">
+          <Chart/>
         </div>
       </div>
     );
