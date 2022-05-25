@@ -5,6 +5,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 # known words
 known = {
+    # material
     'fraxinus': 'Material', 'radiata': 'Material', 'acero': 'Material', 'acrílicas': 'Material',
     'caoba': 'Material', 'polipropileno': 'Material', 'mays': 'Material', 'metal': 'Material',
     'templado': 'Material', 'felpa': 'Material', 'fimbristylis': 'Material', 'melia': 'Material',
@@ -28,16 +29,62 @@ known = {
     'hevea': 'Material', 'cerámico': 'Material', 'mangium': 'Material', 'tablero': 'Material',
     'lana': 'Material', 'haya': 'Material', 'mármol': 'Material', 'zea': 'Material', 'roble':'Material'
     , 'cabra': 'Material', 'melamina': 'Material', 'alba': 'Material', 'poliéster': 'Material',
-    'cerezo': 'Material', 'marinas': 'Material', 'blanco': 'Color', 'rosa': 'Color', 'rojo': 'Color',
+    'cerezo': 'Material', 'marinas': 'Material',
+    # color
+    'blanco': 'Color', 'rosa': 'Color', 'rojo': 'Color',
     'transparente': 'Color', 'naranja': 'Color', 'beige': 'Color', 'amarillo': 'Color', 'azul': 'Color',
     'negro': 'Color', 'cobre': 'Color', 'turquesa': 'Color', 'dorado': 'Color', 'verde': 'Color',
     'gris': 'Color', 'mostaza': 'Color', 'lila': 'Color', 'multicolor': 'Color', 'plateado': 'Color',
-    'natural': 'Color', 'marrón': 'Color', 'recibidor': 'Habitación', 'trabajo': 'Habitación',
+    'natural': 'Color', 'marrón': 'Color',
+    # habitacion
+    'recibidor': 'Habitación', 'trabajo': 'Habitación',
     'comedor': 'Habitación', 'dormitorio': 'Habitación', 'cocina': 'Habitación', 'salón': 'Habitación',
-    'baño': 'Habitación', 'terraza': 'Habitación','vintage': 'Estilo','ecléctico': 'Estilo',
+    'baño': 'Habitación', 'terraza': 'Habitación',
+    # estilo
+    'vintage': 'Estilo','ecléctico': 'Estilo',
     'oriental': 'Estilo','escandinavo': 'Estilo','industrial': 'Estilo','minimalista': 'Estilo',
     'romántico': 'Estilo','moderno': 'Estilo','bohemio': 'Estilo','rústico': 'Estilo',
-    'nórdico': 'Estilo','náutico': 'Estilo','clásico': 'Estilo'
+    'nórdico': 'Estilo','náutico': 'Estilo','clásico': 'Estilo',
+    # forma
+    'Circular': 'Forma', 'Ovalado': 'Forma', 'Forma libre': 'Forma', 'Cónico': 'Forma',
+    'Triangular': 'Forma', 'Cilindrico': 'Forma', 'Cuadrado': 'Forma', 'Geométrico': 'Forma',
+    'Ovalada': 'Forma', 'Imitación': 'Forma', 'Hexágono': 'Forma', 'Amorfo': 'Forma',
+    'Rectangular': 'Forma', 'Cilindrica': 'Forma', 'Cuadrada': 'Forma',
+    # Mueble
+    'sofás': 'Mueble','sofá': 'Mueble','mesa': 'Mueble','mesas': 'Mueble','silla': 'Mueble','sillas': 'Mueble',
+    'sillón': 'Mueble','sillones': 'Mueble','cama': 'Mueble','camas': 'Mueble','alfombra': 'Mueble',
+    'alfombras': 'Mueble','jarrón': 'Mueble','jarrones': 'Mueble','estantería': 'Mueble',
+    'estanterías': 'Mueble','librería': 'Mueble','librerías': 'Mueble','escritorio': 'Mueble',
+    'escritorios': 'Mueble','colchón': 'Mueble','colchones': 'Mueble','cómodas': 'Mueble',
+    'cómoda': 'Mueble','otomanas': 'Mueble','otomana': 'Mueble','mueble': 'Mueble','muebles': 'Mueble',
+    'biblioteca': 'Mueble','bibliotecas': 'Mueble','futón': 'Mueble','futones': 'Mueble','litera': 'Mueble',
+    'literas': 'Mueble','mesita': 'Mueble','mesitas': 'Mueble','mesón': 'Mueble','mesones': 'Mueble',
+    'taburete': 'Mueble','taburetes': 'Mueble','espejo': 'Mueble','espejos': 'Mueble','armario': 'Mueble',
+    'armarios': 'Mueble','banco': 'Mueble','bancos': 'Mueble','organizador': 'Mueble','organizadores': 'Mueble',
+    'perchero': 'Mueble','percheros': 'Mueble','tocador': 'Mueble','tocadores': 'Mueble','somier': 'Mueble',
+    'somieres': 'Mueble','lámpara': 'Mueble','lámparas': 'Mueble','butaca': 'Mueble','butacas': 'Mueble',
+    'cambiador': 'Mueble','cambiadores': 'Mueble','chaiselongue': 'Mueble','chaiselongues': 'Mueble',
+    'cojín': 'Mueble','cojines': 'Mueble','cuadro': 'Mueble','cuadros': 'Mueble','jarra': 'Mueble',
+    'jarras': 'Mueble','colgador': 'Mueble','colgadores': 'Mueble','asiento': 'Mueble','asientos': 'Mueble',
+    'reloj': 'Mueble','relojes': 'Mueble','toallero': 'Mueble','toalleros': 'Mueble','maceta': 'Mueble'
+    ,'macetas': 'Mueble','tumbona': 'Mueble','tumbonas': 'Mueble','papel': 'Mueble','papeles': 'Mueble',
+    'cesto': 'Mueble','cestos': 'Mueble','cesta': 'Mueble','cestas': 'Mueble','cuna': 'Mueble','cunas': 'Mueble',
+    'trona': 'Mueble','tronas': 'Mueble','biombo': 'Mueble','biombos': 'Mueble','sofas': 'Mueble','sofa': 'Mueble',
+    'couch': 'Mueble','chairs': 'Mueble','armchair': 'Mueble','armchairs': 'Mueble','rug': 'Mueble','carpets': 'Mueble',
+    'vase': 'Mueble','vases': 'Mueble','shelving': 'Mueble','shelves': 'Mueble','bookstore': 'Mueble',
+    'libraries': 'Mueble','desk': 'Mueble','desks': 'Mueble','mattress': 'Mueble','mattresses': 'Mueble',
+    'piece of furniture': 'Mueble','furniture': 'Mueble','library': 'Mueble','run': 'Mueble','letter': 'Mueble',
+    'small table': 'Mueble','table': 'Mueble','meson': 'Mueble','mesons': 'Mueble','stool': 'Mueble',
+    'stools': 'Mueble','mirror': 'Mueble','mirrors': 'Mueble','closet': 'Mueble','wardrove': 'Mueble',
+    'banks': 'Mueble','organizer': 'Mueble','organizers': 'Mueble','coat rack': 'Mueble','coat hangers': 'Mueble',
+    'dresser': 'Mueble','players': 'Mueble','lamp': 'Mueble','lamps': 'Mueble','seat': 'Mueble','seats': 'Mueble',
+    'changer': 'Mueble','changers': 'Mueble','cushion': 'Mueble','cushions': 'Mueble','picture': 'Mueble',
+    'jug': 'Mueble','jugs': 'Mueble','hanger': 'Mueble','hangers': 'Mueble','seating': 'Mueble','watch': 'Mueble',
+    'watches': 'Mueble','flowerpot': 'Mueble','pots': 'Mueble','deck chair': 'Mueble','loungers': 'Mueble',
+    'paper': 'Mueble','papers': 'Mueble','dough': 'Mueble','baskets': 'Mueble','the road': 'Mueble','cradle': 'Mueble',
+    'cribs': 'Mueble','trone': 'Mueble','screen': 'Mueble','biples': 'Mueble', "cajón": "Mueble",
+
+    
 }
 
 def load_knn(path):
@@ -47,7 +94,7 @@ def load_knn(path):
 def get_attr_cat(word, model, knn, known):
     """
     Given a word or list of words, returns a classification btwn
-    ["Material", "Color", "Habitación", "not_an_attr_cat"]  according to either an
+    ["Material", "Color", "Habitación","Estilo", "Forma", "not_an_attr_cat"]  according to either an
     existing dict (known) or a knn model (knn)
 
     Params:
