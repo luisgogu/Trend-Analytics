@@ -44,13 +44,13 @@ known = {
     'vintage': 'Estilo','ecléctico': 'Estilo',
     'oriental': 'Estilo','escandinavo': 'Estilo','industrial': 'Estilo','minimalista': 'Estilo',
     'romántico': 'Estilo','moderno': 'Estilo','bohemio': 'Estilo','rústico': 'Estilo',
+    'nórdico': 'Estilo','náutico': 'Estilo','clásico': 'Estilo',
     # forma
     'Circular': 'Forma', 'Ovalado': 'Forma', 'Forma libre': 'Forma', 'Cónico': 'Forma',
     'Triangular': 'Forma', 'Cilindrico': 'Forma', 'Cuadrado': 'Forma', 'Geométrico': 'Forma',
     'Ovalada': 'Forma', 'Imitación': 'Forma', 'Hexágono': 'Forma', 'Amorfo': 'Forma',
     'Rectangular': 'Forma', 'Cilindrica': 'Forma', 'Cuadrada': 'Forma',
-    # muebles
-    'nórdico': 'Estilo','náutico': 'Estilo','clásico': 'Estilo', 
+    # Mueble
     'sofás': 'Mueble','sofá': 'Mueble','mesa': 'Mueble','mesas': 'Mueble','silla': 'Mueble','sillas': 'Mueble',
     'sillón': 'Mueble','sillones': 'Mueble','cama': 'Mueble','camas': 'Mueble','alfombra': 'Mueble',
     'alfombras': 'Mueble','jarrón': 'Mueble','jarrones': 'Mueble','estantería': 'Mueble',
@@ -82,7 +82,9 @@ known = {
     'jug': 'Mueble','jugs': 'Mueble','hanger': 'Mueble','hangers': 'Mueble','seating': 'Mueble','watch': 'Mueble',
     'watches': 'Mueble','flowerpot': 'Mueble','pots': 'Mueble','deck chair': 'Mueble','loungers': 'Mueble',
     'paper': 'Mueble','papers': 'Mueble','dough': 'Mueble','baskets': 'Mueble','the road': 'Mueble','cradle': 'Mueble',
-    'cribs': 'Mueble','trone': 'Mueble','screen': 'Mueble','biples': 'Mueble',
+    'cribs': 'Mueble','trone': 'Mueble','screen': 'Mueble','biples': 'Mueble', "cajón": "Mueble",
+
+    
 }
 
 def load_knn(path):
