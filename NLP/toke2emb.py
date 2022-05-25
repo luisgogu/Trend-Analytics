@@ -60,10 +60,10 @@ def classify_tags(labels, emb, words, model):
         elif tag == 'Forma':
             form.append(e)
         elif tag == 'Mueble':
-            if w[0] in translator:
-                mueb.append(translator[w[0]])
+            if w in translator:
+                mueb.append(translator[w])
             else:
-                mueb.append(w[0])
+                mueb.append(w)
 
     return mat, hab, col, est, form, mueb
 
@@ -91,14 +91,12 @@ def text2token(text, stop_words):
     lang = langid.classify(text)[0]
     text = text.translate(str.maketrans('', '', string.punctuation))
     word_tokens = word_tokenize(text)
-    filtered_sentence = [(w.lower(), lang) for w in word_tokens if not w.lower() in stop_words[lang]]
-    return filtered_sentence
+    filtered_sentence = [w.lower() for w in word_tokens if not w.lower() in stop_words[lang]]
+    return filtered_sentence, lang
 
-def token2emb(filtered_sentence, model):
+def token2emb(filtered_sentence, model, lang):
     embeddings = []
-    for t in filtered_sentence:
-        w = t[0]
-        lang = t[1]
+    for w in filtered_sentence:
         if w in model[lang].key_to_index:
             embeddings.append(model[lang][w])
     return embeddings
@@ -152,9 +150,9 @@ def clean_posts(posts, stop_words, model):
             
         for t in i["tags"]:
             emb += text2emb(t, stop_words, model)
-            words1= text2token(t, stop_words)
-            labels = det.get_attr_cat(words1, model, knn, known)
-            words = token2emb(words1, model)
+            words1, lang = text2token(t, stop_words)
+            labels = det.get_attr_cat(words1, model[lang], knn, known)
+            words = token2emb(words1, model, lang)
             emb += words
             mat2, hab2, col2, est2, form2, mueb2 = classify_tags(labels, words, words1, model)
             mat += mat2
@@ -165,9 +163,9 @@ def clean_posts(posts, stop_words, model):
             mueb += mueb2
 
         for label in ["title", "description", "description2"]:
-            words1 = text2token(i[label], stop_words)
-            labels = det.get_attr_cat(words1, model, knn, known)
-            words = token2emb(words1, model)
+            words1, lang = text2token(i[label], stop_words)
+            labels = det.get_attr_cat(words1, model[lang], knn, known)
+            words = token2emb(words1, model, lang)
             mat2, hab2, col2, est2, form2, mueb2 = classify_tags(labels, words, words1, model)
             mat += mat2
             hab += hab2
@@ -261,7 +259,8 @@ def clean_products(products, stop_words, model):
         result.append(info)
     
     return result
-    
+
+# Computes the cosine similarity between post and product embeddings   
 def similarity(post, product):
     if product == [] or post == []:
         return np.array([[0]])
@@ -270,12 +269,10 @@ def similarity(post, product):
     sim=cosine_similarity(A.reshape(1,-1),B.reshape(1,-1))
     return abs(sim)
 
+# Assigns the best 10 products to every post
 def generate_scores(posts, products):
-    print('NUM POSTS:', len(posts))
 
     for i, post in enumerate(posts):
-        print('pos num:', i)
-        print(post['category'])
 
         scores = []
 
@@ -318,9 +315,6 @@ def generate_scores(posts, products):
 
 def normalize_pop(posts):
 
-    #v = np.random.rand(10)
-    #normalized_v = v/np.linalg.norm(v)
-    
     v = []
     for post in posts:
         f = post["followers"]
@@ -349,7 +343,8 @@ def generate_dict(products):
 # Compute scores for each product in dictionary and sort them
 def compute_scores(posts, products, d):
     for post in posts:
-        for product in post["ranking"]:
-            d[product[0]] += product[2] #* post["followers"]
+        if post['ranking'] != None:
+            for product in post["ranking"]:
+                d[product[0]] += product[2] * post["followers"]
     return sorted(d.items(), key=itemgetter(1), reverse=True)
 
