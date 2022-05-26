@@ -11,6 +11,8 @@ AWS_SECRET_ACCESS_KEY = 'idv19HVI7zKQKfEB3iKCbrHu56aixcCu4lvgkBa+'
 translate = {"Rug": "alfombra", "Pillow": "almohada", "Wardrobe": "armario", "Seat": "asiento", "Tray": "bandeja", "Bag": "bolsa", "Armchair": "butaca", "Box": "caja", "Drawer": "cajón", "Bed": "cama", "Changing mat": "cambiador", "Storage bed": "canapé", "Basket": "cesto", "Chaise longue": "chaiselongue", "Cushion": "cojín", "Mat": "colchoneta", "Mattress": "colchón", "Hanger": "colgador", "Curtain": "cortina", "Picture": "cuadro", "Ladder": "escalera", "Desk": "escritorio", "Mirror": "espejo", "Shelf": "estante", 
 "Shelves": "estantería", "Jar": "jarra", "Vase": "jarrón", "Lamp": "lámpara", "Frame": "marco", "Table": "mesa", "Lampshade": "pantalla", "Wallpaper": "papel", "Coat racks": "perchero", "Kids protector": "protector", "Puff": "puff", "Clock": "reloj", "Footstool": "reposapies", "Chair": "silla", "Couch": "sillón", "Sofa": "sofá", "Stool": "taburete", "Suction pad": "ventosa", "Shoerack": "zapatero"}
 
+translate2 = {"Style":"Estilo","Room":"Habitación","Color":"Color","Material":"Material"}
+
 def extract_date(l):
     if l is None:
         return l
@@ -58,8 +60,9 @@ class Answer_Query_Alg2:
     def __init__(self, query):
         self.S3connection()
         products = [translate[p] for p in query['product']]
+        
         self.extraction = ext.clean_S3_extractor(products = products)
-        self.dic = tools.compute_ranking_characteristics(self.extraction.filtered_posts, query["feature"])
+        self.dic = tools.compute_ranking_characteristics(self.extraction.filtered_posts, translate2[query["feature"]])
 
     def S3connection(self):
         "Establishes connection with S3"
