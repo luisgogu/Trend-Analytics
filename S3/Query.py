@@ -18,7 +18,7 @@ class Answer_Query_Alg1:
     def __init__(self, query):
         self.S3connection()
         products = [translate[p] for p in query['product']]
-        self.extraction = ext.clean_S3_extractor(initial_date = extract_date(query['from']),end_date = extract_date(query['to']),products = products)
+        self.extraction = ext.clean_S3_extractor(initial_date = extract_date(query['from'][0]),end_date = extract_date(query['to'][0]),products = products)
         self.dic = tools.generate_dict(self.extraction.filtered_products)
         #self.scored_posts = tools.generate_scores(extraction.filtered_posts, extraction.filtered_products)
         self.ranking = tools.compute_scores(self.extraction.filtered_posts, self.extraction.filtered_products, self.dic)
