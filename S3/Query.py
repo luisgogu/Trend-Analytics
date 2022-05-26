@@ -6,8 +6,8 @@ import tools
 AWS_ACCESS_KEY_ID = 'AKIAQ6I2MOXSLD4G2YGT'
 AWS_SECRET_ACCESS_KEY = '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'
 
-translate = {"rug": "alfombra", "pillow": "almohada", "wardrobe": "armario", "seat": "asiento", "tray": "bandeja", "bag": "bolsa", "armchair": "butaca", "box": "caja", "drawer": "cajón", "bed": "cama", "changing mat": "cambiador", "storage bed": "canapé", "basket": "cesto", "chaise longue": "chaiselongue", "cushion": "cojín", "mat": "colchoneta", "mattress": "colchón", "hanger": "colgador", "curtain": "cortina", "picture": "cuadro", "ladder": "escalera", "desk": "escritorio", "mirror": "espejo", "shelf": "estante", 
-"shelves": "estantería", "jar": "jarra", "vase": "jarrón", "lamp": "lámpara", "frame": "marco", "table": "mesa", "lampshade": "pantalla", "wallpaper": "papel", "coat racks": "perchero", "kids protector": "protector", "puff": "puff", "clock": "reloj", "footstool": "reposapies", "chair": "silla", "couch": "sillón", "sofa": "sofá", "stool": "taburete", "suction pad": "ventosa", "shoerack": "zapatero"}
+translate = {"Rug": "alfombra", "Pillow": "almohada", "Wardrobe": "armario", "Seat": "asiento", "Tray": "bandeja", "Bag": "bolsa", "Armchair": "butaca", "Box": "caja", "Drawer": "cajón", "Bed": "cama", "Changing mat": "cambiador", "Storage bed": "canapé", "Basket": "cesto", "Chaise longue": "chaiselongue", "Cushion": "cojín", "Mat": "colchoneta", "Mattress": "colchón", "Hanger": "colgador", "Curtain": "cortina", "Picture": "cuadro", "Ladder": "escalera", "Desk": "escritorio", "Mirror": "espejo", "Shelf": "estante", 
+"Shelves": "estantería", "Jar": "jarra", "Vase": "jarrón", "Lamp": "lámpara", "Frame": "marco", "Table": "mesa", "Lampshade": "pantalla", "Wallpaper": "papel", "Coat racks": "perchero", "Kids protector": "protector", "Puff": "puff", "Clock": "reloj", "Footstool": "reposapies", "Chair": "silla", "Couch": "sillón", "Sofa": "sofá", "Stool": "taburete", "Suction pad": "ventosa", "Shoerack": "zapatero"}
 
 def extract_date(l):
     if l is None:
