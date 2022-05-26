@@ -1,0 +1,24 @@
+{
+    "product": [
+        {
+        "Color": "Red",
+        "Material": "Wood",
+        "Room": "Dining Room"
+    },
+    {
+        "Color": "Orange",
+        "Material": "Wood",
+        "Room": "Living Room"
+    },
+    {
+        "Color": "Silver",
+        "Material": "Metal",
+        "Room": "Bedroom"
+    },
+    {
+        "Color": "Copper",
+        "Material": "Metal",
+        "Room": "Bathroom"
+    }
+]
+}
