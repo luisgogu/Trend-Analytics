@@ -9,7 +9,7 @@ import "./Graphics.css"
 
 
 var a = []
-const OPTIONS = ["Sofa", "Chair", "Bed", "Table"];
+const OPTIONS = ["Rug","Pillow","Wardrobe","Seat","Tray","Bag","Armchair","Box","Drawer","Bed","Changing mat","Storage bed","Basket","Chaise longue","Cushion","Mattress","Hanger","Curtain","Picture","Ladder","Desk","Mirror","Shelf","Mat", "Shelves", "Jar", "Vase", "Lamp", "Frame", "Table", "Lampshade", "Wallpaper", "Coat racks", "Kids protector", "Puff", "Clock", "Footstool", "Chair", "Couch", "Sofa", "Stool", "Suction pad", "Shoerack"];
 class App extends React.Component {
   state = {
     checkboxes: OPTIONS.reduce(

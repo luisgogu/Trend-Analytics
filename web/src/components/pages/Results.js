@@ -2,13 +2,13 @@ import React from 'react'
 import '../../App.css'
 //import Graphics from '../Graphics';
 import Filter from '../Filter';
+import "./Results.css"
 
 function Results() {
-  //return <h1 className='results'> Results </h1>
   return(
-    <>
+    <div className='container'>
       <Filter/>
-    </>
+    </div>
   )
 }
 
