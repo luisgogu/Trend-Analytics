@@ -3,6 +3,11 @@ import datetime
 import json
 import re
 
+
+AWS_ACCESS_KEY_ID = 'AKIAQ6I2MOXSLD4G2YGT'
+AWS_SECRET_ACCESS_KEY = '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'
+
+
 def extract_product(filename):
     return filename.split('/')[3]
 
@@ -42,11 +47,14 @@ class clean_S3_extractor:
         self.filtered_products = []
         self.extract_posts()
         self.extract_products()
-        
+    
     def S3connection(self):
         "Establishes connection with S3"
-        sqs = boto3.resource('sqs')
-        self.s3 = boto3.resource('s3')
+        session = boto3.Session(
+            aws_access_key_id=AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        )
+        self.s3 = session.resource('s3', region_name='eu-west-3')
                     
     def filter_by_date(self, initial_date, end_date):
         "Contemplates all possible cases of entry of date parameters"
@@ -193,6 +201,7 @@ class clean_S3_extractor:
     def extract_posts(self):
         "Extract the files selected from bigpapa project and treat data extracted"
         for filename in self.list_of_docs:
+            print(filename)
             obj = self.s3.Object('tracktrend.cleaneddata', filename)
             data = ''
             # read the data
