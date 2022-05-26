@@ -59,7 +59,8 @@ def compute_scores(posts, products, d):
             continue
         if post['ranking'] is not None:
             for product in post["ranking"]:
-                d[product[0]] = (d[product[0]][0] + product[1]*post["followers"], d[product[0]][1], d[product[0]][2])  
+                if product[0] in d:
+                    d[product[0]] = (d[product[0]][0] + product[1]*post["followers"], d[product[0]][1], d[product[0]][2])  
     result = {"products":[]}
     for t in sorted(d.items(), key=itemgetter(1), reverse=True)[:10]:
         result["products"].append({"product": t[1][1],"popularity": t[1][0],"url": t[1][2]}) 
