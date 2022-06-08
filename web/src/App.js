@@ -8,7 +8,7 @@ import Video from './components/pages/Video';
 
 function App() {
   return (
-    <>
+    <div className='container'>
     <Router>
       <Navbar />
       <Switch>
@@ -18,7 +18,7 @@ function App() {
       </Switch>
     </Router>
       
-    </>
+    </div>
   );
 }
 

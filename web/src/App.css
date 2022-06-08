@@ -18,6 +18,7 @@
 
 .services {
   /*background-image: url('./../public/images/img-2.jpg');*/
+  background-color: #f4f4f4;
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -27,6 +28,7 @@
 
 .products {
   /*background-image: url('./../public/images/img-1.jpg');*/
+  background-color: #f4f4f4;
   background-position: center;
   background-size: fill;
   background-repeat: no-repeat;
@@ -41,4 +43,9 @@
   background-repeat: no-repeat;
   color: #fff;
   font-size: 100px;
+  background-color: #f4f4f4;
+
+}
+.container{
+  background-color: #f4f4f4;
 }

@@ -14,6 +14,7 @@
     content: "";
     display: table;
     clear: both;
+    background-color: #f4f4f4;
 }
 .btn-filter{
     background-color: #c65653;

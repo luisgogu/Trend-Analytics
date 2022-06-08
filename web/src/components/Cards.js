@@ -18,34 +18,34 @@ function Cards() {
                     />
                     <CardItem
                         src='images/nuria.jpeg'
-                        text='Sub-Team Leader'
+                        text='Software Engineer'
                         label='Nuria Cantero'
                     />
                     <CardItem
                         src='images/maria.jpeg'
-                        text='IT team'
+                        text='Software Engineer'
                         label='Maria Zyatyugina'
                     />
                 </ul>
                 <ul className='cards__items'>
                     <CardItem
                         src='images/javi.jpeg'
-                        text='IT team'
+                        text='Software Engineer'
                         label='Javier Mestre'
                     />
                     <CardItem
                         src='images/aina.jpeg'
-                        text='Communication and financial manager'
+                        text='Data Analyst'
                         label='Aina Mas'
                     />
                     <CardItem
                         src='images/luis.jpeg'
-                        text='Unpaid intern'
+                        text='Data Analyst'
                         label='Luis Gonzalez'
                     />
                     <CardItem
-                    src='images/richi.jpeg'
-                    text='Event manager'
+                    src='images/richi.jpg'
+                    text='Data Engineer'
                     label='Ricard Tarre'
                     /> 
                 </ul>
