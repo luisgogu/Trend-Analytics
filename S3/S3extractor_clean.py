@@ -19,6 +19,7 @@ def treat_number(num_in_str):
     return int(num_in_str)
 
 def treat_scores(p):
+    #('CC2225PR86', '[0.3796251, 0, 0.3003234, 0.25830054, 0, 0.07252975]', '0.16846313327550888')
     scores = []
     if p["ranking"] is None:
         return p

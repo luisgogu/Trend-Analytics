@@ -16,7 +16,7 @@ translate2 = {"Style":"Estilo","Room":"Habitación","Color":"Color","Material":"
 def extract_date(l):
     if l is None:
         return l
-    return datetime.date(int(l[0][0:4]), int(l[0][5:7]), int(l[0][8:10]))
+    return datetime.date(int(l[0:4]), int(l[5:7]), int(l[8:10]))
 
 def treat_scores(p):
     scores = []
@@ -31,22 +31,9 @@ class Answer_Query_Alg1:
     def __init__(self, query):
         self.S3connection()
         products = [translate[p] for p in query['product']]
-        #dt = json.load('fake_json.json')
-        self.extraction = ext.clean_S3_extractor(initial_date = None,end_date = None,products = products)
-        #match = {p["sku"]:p["id"] for p in self.extraction.filtered_products}
-        #scores = []
-        #for ranked in ranking:
-        #    if match[ranked[0]] in products:
-        #        scores.append(ranked)
-        res = pickle.load(open('scores_output_validation.pickle', 'rb'))
-        new_res = []
-        for k in res:
-            if k["id"].lower() in products:
-                new_res.append(treat_scores(k))
-        #self.extraction = ext.clean_S3_extractor(initial_date = extract_date(query['from']),end_date = extract_date(query['to']),products = products)
+        self.extraction = ext.clean_S3_extractor(initial_date = extract_date(query['from']),end_date = extract_date(query['to']),products = products)
         self.dic = tools.generate_dict(self.extraction.filtered_products)
-        #self.scored_posts = tools.generate_scores(new_res, extraction.filtered_products)
-        self.ranking = tools.compute_scores(new_res, self.extraction.filtered_products, self.dic)
+        self.ranking = tools.compute_scores(self.extraction.filtered_posts, self.extraction.filtered_products, self.dic)
 
     def S3connection(self):
         "Establishes connection with S3"

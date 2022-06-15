@@ -60,7 +60,7 @@ class raw_S3_extractor:
         self.clean_posts = []
         self.clean_products = []
         self.list_of_posts = [obj.key for obj 
-                in self.bucketPosts.objects.filter(Prefix= "2013/").all()]
+                in self.bucketPosts.objects.filter(Prefix= "2021/").all()]
         self.extract_docs_products()
         self.extract_docs_posts()
         self.stopwords = self.get_stopwords()

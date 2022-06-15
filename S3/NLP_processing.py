@@ -14,7 +14,7 @@ import spacy
 from sklearn.metrics.pairwise import cosine_similarity,cosine_distances
 import operator
 
-translator = {'sofás': 'sofá', 'mesas': 'mesa', 'sillas': 'silla', 'sillones': 'sillón', 'camas': 'cama', 'alfombras': 'alfombra', 'jarrones': 'jarrón', 'estanterías': 'estantería', 'escritorios': 'escritorio', 'colchones': 'colchón', 'taburetes': 'taburete', 'espejos': 'espejo', 'armarios':'armario', 'percheros': 'perchero', 'lámparas': 'lámpara', 'butacas': 'butaca', 'cambiadores': 'cambiador', 'chaiselongues': 'chaiselongue', 'cojines': 'cojín', 'cuadros': 'cuadro', 'jarras': 'jarra', 'colgadores': 'colgador', 'asientos': 'asiento', 'relojes': 'reloj', 'papeles': 'papel', 'cestos': 'cesto', 'cesta': 'cesto', 'cestas': 'cesto', 'sofas': 'sofás','sofa': 'sofá','couch': 'sofá','chairs': 'silla', 'chair': 'silla', 'armchair': 'butaca','armchairs': 'butaca','rug': 'alfombra','carpets': 'alfombra','vase': 'jarrón','vases': 'jarrones','shelving': 'estantería','shelves': 'estantería','bookstore': 'estantería','libraries': 'estantería','desk': 'escritorio','desks': 'escritorio','mattress': 'colchon','mattresses': 'colchon', 'library': 'estantería', 'stool': 'taburete','stools': 'taburetes','mirror': 'espejo','mirrors': 'espejo','closet': 'armario','wardrove': 'armario', 'dresser': 'cómoda','lamp': 'lámpara','lamps': 'lámpara','seat': 'silla','seats': 'silla','changer': 'armario','changers': 'armarios','cushion': 'cojín','cushions': 'cojín','picture': 'cuadro','jug': 'jarra','jugs': 'jarra','hanger': 'perchero','hangers': 'perchero','seating': 'butaca','paper': 'papel','papers': 'papel','baskets': 'cesto','table': 'mesa', 'pillow': 'almohada', 'almohadas': 'almohada', 'pillows': 'almohada', 'drawer': 'cajón', 'cajones': 'cajón', 'drawers': 'cajón', 'zapateros': 'zapatero', 'shoerack': 'zapatero', 'shoeracks': 'zapatero'}
+translator = {'sofás': 'sofa', 'mesas': 'mesa', 'sillas': 'silla', 'sillones': 'sillon', 'camas': 'cama', 'alfombras': 'alfombra', 'jarrones': 'jarron', 'estanterías': 'estanteria', 'escritorios': 'escritorio', 'colchones': 'colchon', 'taburetes': 'taburete', 'espejos': 'espejo', 'armarios':'armario', 'percheros': 'perchero', 'lámparas': 'lampara', 'butacas': 'butaca', 'cambiadores': 'cambiador', 'chaiselongues': 'chaiselongue', 'cojines': 'cojin', 'cuadros': 'cuadro', 'jarras': 'jarra', 'colgadores': 'colgador', 'asientos': 'asiento', 'relojes': 'reloj', 'papeles': 'papel', 'cestos': 'cesto', 'cesta': 'cesto', 'cestas': 'cesto', 'sofas': 'sofa','sofa': 'sofa','couch': 'sofa','chairs': 'silla', 'chair': 'silla', 'armchair': 'butaca','armchairs': 'butaca','rug': 'alfombra','carpets': 'alfombra','vase': 'jarron','vases': 'jarrones','shelving': 'estanteria','shelves': 'estanteria','bookstore': 'estanteria','libraries': 'estanteria','desk': 'escritorio','desks': 'escritorio','mattress': 'colchon','mattresses': 'colchon', 'library': 'estanteria', 'stool': 'taburete','stools': 'taburetes','mirror': 'espejo','mirrors': 'espejo','closet': 'armario','wardrove': 'armario', 'dresser': 'comoda','lamp': 'lámpara','lamps': 'lampara','seat': 'silla','seats': 'silla','changer': 'armario','changers': 'armarios','cushion': 'cojin','cushions': 'cojin','picture': 'cuadro','jug': 'jarra','jugs': 'jarra','hanger': 'perchero','hangers': 'perchero','seating': 'butaca','paper': 'papel','papers': 'papel','baskets': 'cesto','table': 'mesa', 'pillow': 'almohada', 'almohadas': 'almohada', 'pillows': 'almohada', 'drawer': 'cajon', 'cajones': 'cajon', 'drawers': 'cajon', 'zapateros': 'zapatero', 'shoerack': 'zapatero', 'shoeracks': 'zapatero',}
 
 import spacy 
 language_list = ['en','es', 'fr', 'pt', 'it']
@@ -159,6 +159,7 @@ def generate_scores(post, products, embedding):
 
     if scores != []:
         result = []
+        #print(scores)
         for k in sorted(scores,key=operator.itemgetter(2), reverse=True)[:10]:
             result.append((k[0], str(k[1]),str(k[2])))
         return result
@@ -197,7 +198,8 @@ class NLP_processing:
                 i["tags"] = i["tags"][:5]
 
             for t in i["tags"]:
-                classify_words(t, stop_words, model,attr, knn)
+                aux_t = t
+                classify_words(aux_t, stop_words, model,attr, knn)
                 emb += text2emb(t, stop_words, model)
                 words1, lang = text2token(t, stop_words)
                 labels = det.get_attr_cat(words1, model[lang], knn, known)
@@ -212,7 +214,8 @@ class NLP_processing:
                 mueb += mueb2
 
             for label in ["title", "description", "description2"]:
-                classify_words(i[label], stop_words, model,attr, knn)
+                aux_t = i[label]
+                classify_words(aux_t, stop_words, model,attr, knn)
                 words1, lang = text2token(i[label], stop_words)
                 labels = det.get_attr_cat(words1, model[lang], knn, known)
                 words = token2emb(words1, model, lang)
