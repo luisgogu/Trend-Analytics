@@ -6,4 +6,4 @@ We are now thinking about how to code our aplication. It's time to design thinki
 
 - Documentation on NLP alogorithms: [NLP DOC](./NLP/README.md)
 - Documentation on [Scraping](./Scraping/README.md)
-- Documentation on the Web development: [WEB](./web/READ.md) 
+- Documentation on the Web development: [WEB](./web/README.md) 
