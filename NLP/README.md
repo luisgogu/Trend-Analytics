@@ -1,7 +1,5 @@
 # NLP MODELS
 
-## Model1
+You can access the model 1 (Feature extractor) documentation [here](./Model1/README.md) and the model 2 (Post-Product matching) documentation [here](./Model1/README.md).
 
-Acces to model 1 doc -> [Model 1](./Model1/README.md)
-
-Acces to Facebook FastText alligned word vectores [Embeddings](https://fasttext.cc/docs/en/aligned-vectors.html)
+The Facebook FastText aligned word vectors can be accessed [here](https://fasttext.cc/docs/en/aligned-vectors.html)
